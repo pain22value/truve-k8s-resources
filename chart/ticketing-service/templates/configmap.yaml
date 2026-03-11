@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-ticketing-config
+data:
+  application-prod.yaml: |-
+    spring:
+      datasource:
+        url: {{ .Values.config.SPRING_DATASOURCE_URL | quote }}
+      data:
+        redis:
+          cluster:
+            nodes: {{ .Values.config.SPRING_DATA_REDIS_CLUSTER_NODES | quote }}
