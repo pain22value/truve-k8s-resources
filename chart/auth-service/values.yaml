@@ -1,0 +1,19 @@
+replicaCount: 1
+
+image:
+  repository: kye8780/auth-server
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8081
+
+ingress:
+  enabled: false
+
+config:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://truve-mysql-test.c14q2m426g1v.ap-northeast-2.rds.amazonaws.com:3306/user_db"
+  SPRING_DATA_REDIS_CLUSTER_NODES: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com:6379"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-service.truve-kafka.svc.cluster.local:9092"
