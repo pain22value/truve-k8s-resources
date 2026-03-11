@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-queue-config
+data:
+  application-prod.yaml: |-
+    spring:
+      data:
+        redis:
+          cluster:
+            nodes: {{ .Values.config.SPRING_DATA_REDIS_CLUSTER_NODES | quote }}

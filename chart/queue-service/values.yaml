@@ -1,0 +1,17 @@
+replicaCount: 1
+
+image:
+  repository: kye8780/queue
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8083
+
+ingress:
+  enabled: false
+
+config:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SPRING_DATA_REDIS_CLUSTER_NODES: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com:6379"
