@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: kye8780/ticketing
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8084
+
+ingress:
+  enabled: false
+
+config:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://truve-mysql-test.c14q2m426g1v.ap-northeast-2.rds.amazonaws.com:3306/ticketing_db"
+  SPRING_DATA_REDIS_CLUSTER_NODES: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com:6379"

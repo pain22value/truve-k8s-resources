@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-ticketing-service
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: ticketing-service
+  template:
+    metadata:
+      labels:
+        app: ticketing-service
+    spec:
+      containers:
+        - name: ticketing-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          
+          env:
+            {{- range $key, $value := .Values.config }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: SERVER_PORT
+              value: {{ .Values.service.port | quote }}
+
+          envFrom:
+            - secretRef:
+                name: {{ .Release.Name }}-ticketing-secrets
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-ticketing-config
