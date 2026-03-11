@@ -1,34 +1,37 @@
-# gateway-service의 기본값을 설정합니다.
-
-# 디플로이먼트에서 생성할 파드(Pod)의 개수
 replicaCount: 1
 
-# 사용할 도커 이미지 정보
 image:
-  repository: kye8780/api-gateway 
+  repository: kye8780/api-gateway
   tag: "latest"
   pullPolicy: IfNotPresent
 
-# 서비스를 클러스터 내부에 노출할 방식과 포트 설정
 service:
   type: ClusterIP
   port: 8080
 
-# 외부 트래픽을 서비스로 연결해주는 인그레스(Ingress) 설정
 ingress:
-  enabled: true 
+  enabled: true
+  ingressClassName: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:599476212908:certificate/c777a244-2261-47b1-aea0-0f68c9fb5249
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/healthcheck-path: /swagger-ui/index.html
+    alb.ingress.kubernetes.io/success-codes: '200'
   hosts:
-    - host: gateway.truve.com
+    - host: gateway.truve.site
       paths:
-        - path:
-          pathType: ImplementationSpecific
+        - path: /
+          pathType: Prefix
 
-# 환경변수 설정을 위한 ConfigMap 값
-# 다른 서비스들과의 통신을 위한 주소 정보입니다.
 config:
-  auth_server_uri: "http://auth-service:8081"
-  payment_server_uri: "http://payment-service:8082"
-  queue_server_uri: "http://queue-service:8083"
-  ticketing_server_uri: "http://ticketing-service:8084"
+  auth_server_uri: "http://auth-service.truve-auth-service.svc.cluster.local:8081"
+  payment_server_uri: "http://payment-service.truve-payment-service.svc.cluster.local:8082"
+  queue_server_uri: "http://queue-service.truve-queue-service.svc.cluster.local:8083"
+  ticketing_server_uri: "http://ticketing-service.truve-ticketing-service.svc.cluster.local:8084"
+  musical_server_uri: "http://musical-service.truve-musical-service.svc.cluster.local:8085"
   user_redis_host: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com"
   user_redis_port: "6379"
+  jwt_secret: "truve-secret-key"
