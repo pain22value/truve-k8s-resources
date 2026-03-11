@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-payment-config
+data:
+  application-prod.yaml: |-
+    spring:
+      datasource:
+        url: {{ .Values.config.SPRING_DATASOURCE_URL | quote }}
+    
+    PAYMENT_MYSQL_URL: {{ .Values.config.SPRING_DATASOURCE_URL | quote }}
