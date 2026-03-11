@@ -27,21 +27,21 @@ spec:
             - containerPort: {{ .Values.service.port }}
           env:
             - name: AUTH_SERVER_URI
-              value: { { .Values.config.auth_server_uri | quote } }
+              value: {{ .Values.config.auth_server_uri | quote }}
             - name: PAYMENT_SERVER_URI
-              value: { { .Values.config.payment_server_uri | quote } }
+              value: {{ .Values.config.payment_server_uri | quote }}
             - name: QUEUE_SERVER_URI
-              value: { { .Values.config.queue_server_uri | quote } }
+              value: {{ .Values.config.queue_server_uri | quote }}
             - name: TICKETING_SERVER_URI
-              value: { { .Values.config.ticketing_server_uri | quote } }
+              value: {{ .Values.config.ticketing_server_uri | quote }}
             - name: MUSICAL_SERVER_URI
-              value: { { .Values.config.musical_server_uri | quote } }
+              value: {{ .Values.config.musical_server_uri | quote }}
             - name: USER_REDIS_HOST
-              value: { { .Values.config.user_redis_host | quote } }
+              value: {{ .Values.config.user_redis_host | quote }}
             - name: USER_REDIS_PORT
-              value: { { .Values.config.user_redis_port | quote } }
+              value: {{ .Values.config.user_redis_port | quote }}
             - name: JWT_SECRET
-              value: { { .Values.config.jwt_secret | quote } }
+              value: {{ .Values.config.jwt_secret | quote }}
 
             - name: SPRINGDOC_SWAGGER_UI_URLS_0_NAME
               value: "01-Auth Service"
