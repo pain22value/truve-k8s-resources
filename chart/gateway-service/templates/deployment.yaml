@@ -16,8 +16,54 @@ spec:
         - name: gateway-service
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
           ports:
             - containerPort: {{ .Values.service.port }}
-          envFrom:
-            - configMapRef:
-                name: {{ .Release.Name }}-gateway-service
+          env:
+            - name: AUTH_SERVER_URI
+              value: { { .Values.config.auth_server_uri | quote } }
+            - name: PAYMENT_SERVER_URI
+              value: { { .Values.config.payment_server_uri | quote } }
+            - name: QUEUE_SERVER_URI
+              value: { { .Values.config.queue_server_uri | quote } }
+            - name: TICKETING_SERVER_URI
+              value: { { .Values.config.ticketing_server_uri | quote } }
+            - name: MUSICAL_SERVER_URI
+              value: { { .Values.config.musical_server_uri | quote } }
+            - name: USER_REDIS_HOST
+              value: { { .Values.config.user_redis_host | quote } }
+            - name: USER_REDIS_PORT
+              value: { { .Values.config.user_redis_port | quote } }
+            - name: JWT_SECRET
+              value: { { .Values.config.jwt_secret | quote } }
+
+            - name: SPRINGDOC_SWAGGER_UI_URLS_0_NAME
+              value: "01-Auth Service"
+            - name: SPRINGDOC_SWAGGER_UI_URLS_0_URL
+              value: "/api/auth/v3/api-docs"
+
+            - name: SPRINGDOC_SWAGGER_UI_URLS_1_NAME
+              value: "02-Payment Service"
+            - name: SPRINGDOC_SWAGGER_UI_URLS_1_URL
+              value: "/api/payments/v3/api-docs"
+
+            - name: SPRINGDOC_SWAGGER_UI_URLS_2_NAME
+              value: "03-Queue Service"
+            - name: SPRINGDOC_SWAGGER_UI_URLS_2_URL
+              value: "/api/queue/v3/api-docs"
+
+            - name: SPRINGDOC_SWAGGER_UI_URLS_3_NAME
+              value: "04-Ticketing Service"
+            - name: SPRINGDOC_SWAGGER_UI_URLS_3_URL
+              value: "/api/ticketing/v3/api-docs"
+
+            - name: SPRINGDOC_SWAGGER_UI_URLS_4_NAME
+              value: "05-Musical Service"
+            - name: SPRINGDOC_SWAGGER_UI_URLS_4_URL
+              value: "/api/shows/v3/api-docs"
