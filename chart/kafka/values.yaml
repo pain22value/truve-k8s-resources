@@ -1,0 +1,13 @@
+replicaCount: 1
+
+zookeeper:
+  image: confluentinc/cp-zookeeper:7.5.0
+  port: 2181
+
+kafka:
+  image: confluentinc/cp-kafka:7.5.0
+  port: 9092
+  advertisedListeners: "PLAINTEXT://kafka-service.truve-kafka.svc.cluster.local:9092"
+
+nodeSelector:
+  eks.amazonaws.com/nodegroup: truve-kafka-prod-ng
