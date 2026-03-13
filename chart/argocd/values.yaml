@@ -1,6 +1,13 @@
 argo-cd:
   global:
     domain: argocd.truve.site
+    nodeSelector:
+      eks.amazonaws.com/nodegroup: truve-cicd-prod-ng
+    tolerations:
+      - key: "workload"
+        operator: "Equal"
+        value: "cicd"
+        effect: "NoSchedule"
 
   server:
     extraArgs:
