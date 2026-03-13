@@ -7,5 +7,6 @@ data:
   PAYMENT_SERVER_URI: {{ .Values.config.payment_server_uri | quote }}
   QUEUE_SERVER_URI: {{ .Values.config.queue_server_uri | quote }}
   TICKETING_SERVER_URI: {{ .Values.config.ticketing_server_uri | quote }}
+  MUSICAL_SERVER_URI: {{ .Values.config.musical_server_uri | quote }}
   USER_REDIS_HOST: {{ .Values.config.user_redis_host | quote }}
   USER_REDIS_PORT: {{ .Values.config.user_redis_port | quote }}
