@@ -5,24 +5,26 @@ metadata:
   name: zookeeper-headless
 spec:
   clusterIP: None
-  ports:
-    - name: client
-      port: { { .Values.zookeeper.port } }
-      targetPort: { { .Values.zookeeper.port } }
   selector:
     app: zookeeper
+  ports:
+    - name: client
+      port: {{ .Values.zookeeper.port }}
+      targetPort: {{ .Values.zookeeper.port }}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: zookeeper-service
 spec:
-  ports:
-    - name: client
-      port: { { .Values.zookeeper.port } }
-      targetPort: { { .Values.zookeeper.port } }
   selector:
     app: zookeeper
+  ports:
+    - name: client
+      port: {{ .Values.zookeeper.port }}
+      targetPort: {{ .Values.zookeeper.port }}
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -30,7 +32,7 @@ metadata:
   name: zookeeper
 spec:
   serviceName: zookeeper-headless
-  replicas: { { .Values.zookeeper.replicaCount } }
+  replicas: 1
   selector:
     matchLabels:
       app: zookeeper
@@ -39,40 +41,40 @@ spec:
       labels:
         app: zookeeper
     spec:
-      nodeSelector: { { - toYaml .Values.nodeSelector | nindent 8 } }
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
 
-      tolerations: { { - toYaml .Values.tolerations | nindent 8 } }
+      {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
 
-      affinity: { { - toYaml .Values.affinity | nindent 8 } }
+      {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
 
       containers:
         - name: zookeeper
-          image: { { .Values.zookeeper.image } }
+          image: {{ .Values.zookeeper.image | quote }}
           imagePullPolicy: IfNotPresent
 
           ports:
             - name: client
-              containerPort: { { .Values.zookeeper.port } }
-
-          resources: { { - toYaml .Values.zookeeper.resources | nindent 12 } }
+              containerPort: {{ .Values.zookeeper.port }}
 
           env:
             - name: ZOOKEEPER_CLIENT_PORT
-              value: '{{ .Values.zookeeper.port }}'
+              value: {{ .Values.zookeeper.port | quote }}
             - name: ZOOKEEPER_TICK_TIME
-              value: '{{ .Values.zookeeper.tickTime | default 2000 | quote }}'
+              value: "2000"
 
-          volumeMounts:
-            - name: zookeeper-data
-              mountPath: /var/lib/zookeeper/data
-
-  volumeClaimTemplates:
-    - metadata:
-        name: zookeeper-data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: { { .Values.zookeeper.persistence.storageClass } }
-        resources:
-          requests:
-            storage: { { .Values.zookeeper.persistence.size } }
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
