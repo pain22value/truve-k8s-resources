@@ -12,6 +12,22 @@ spec:
       labels:
         app: gateway-service
     spec:
+      nodeSelector:
+        workload: app
+
+      tolerations:
+        - key: "workload"
+          operator: "Equal"
+          value: "app"
+          effect: "NoSchedule"
+
+      initContainers:
+        - name: copy-otel-agent
+          image: busybox:1.36
+          command: ["sh", "-c", "wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar -O /otel/opentelemetry-javaagent.jar"]
+          volumeMounts:
+            - name: otel-agent
+              mountPath: /otel
       containers:
         - name: gateway-service
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -75,3 +91,16 @@ spec:
               value: "06-Musical Service"
             - name: SPRINGDOC_SWAGGER_UI_URLS_5_URL
               value: "/api/shows/v3/api-docs"
+            - name: OTEL_SERVICE_NAME
+              value: "gateway-service"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector.monitoring.svc.cluster.local:4317"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/otel/opentelemetry-javaagent.jar"
+
+          volumeMounts:
+            - name: otel-agent
+              mountPath: /otel
+      volumes:
+        - name: otel-agent
+          emptyDir: {}
