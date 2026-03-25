@@ -6,7 +6,7 @@
 # - 스토리지
 #############################################
 replicaCount: 3
-namespace: kafka
+namespace: truve-kafka
 
 zookeeper:
   replicaCount: 3

@@ -8,8 +8,11 @@ spec:
 
   source:
     repoURL: https://github.com/pain22value/truve-k8s-resources.git
-    targetRevision: feat/#15
+    targetRevision: HEAD
     path: chart/kafka
+    helm:
+      valueFiles:
+        - values.yaml
 
   destination:
     server: https://kubernetes.default.svc
