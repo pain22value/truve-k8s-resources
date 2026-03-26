@@ -1,68 +1,34 @@
-#############################################
-# 설정값 정의
-# - replica 수
-# - 리소스
-# - 스케줄링
-# - 스토리지
-#############################################
 replicaCount: 3
-namespace: truve-kafka
 
 zookeeper:
-  replicaCount: 3
-  image: confluentinc/cp-zookeeper:7.5.0
-  port: 2181
-  tickTime: 2000
-
-  resources:
-    requests:
-      cpu: '250m'
-      memory: '512Mi'
-    limits:
-      cpu: '500m'
-      memory: '1Gi'
-
-  persistence:
-    storageClass: gp3
-    size: 20Gi
+  image: "confluentinc/cp-zookeeper:7.5.0"
+  clientPort: 2181
+  secureClientPort: 2888
+  storage:
+    size: 5Gi
+    storageClassName: gp3
 
 kafka:
-  image: confluentinc/cp-kafka:7.5.0
+  image: "confluentinc/cp-kafka:7.5.0"
   port: 9092
-  advertisedListeners: 'PLAINTEXT://kafka-service.kafka.svc.cluster.local:9092'
+  replicationFactor: 3
+  storage:
+    size: 20Gi
+    storageClassName: gp3
 
-  resources:
-    requests:
-      cpu: '500m'
-      memory: '2Gi'
-    limits:
-      cpu: '1'
-      memory: '4Gi'
-
-  persistence:
-    storageClass: gp3
-    size: 50Gi
-
-# Terraform에서 kafka 노드그룹에 "kafka" 라벨 부여
 nodeSelector:
   workload: kafka
 
-# kafka 노드그룹에 taint 줬기 때문에 없으면 스케줄 안됨
 tolerations:
-  - key: 'workload'
-    operator: 'Equal'
-    value: 'kafka'
-    effect: 'NoSchedule'
-
-# 브로커가 같은 노드에 몰리는걸 막기 위한 최소 설정
-affinity:
-  podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-            - key: app
-              operator: In
-              values:
-                - kafka
-                - zookeeper
-        topologyKey: kubernetes.io/hostname
+  - key: "node.kubernetes.io/not-ready"
+    operator: "Exists"
+    effect: "NoExecute"
+    tolerationSeconds: 300
+  - key: "node.kubernetes.io/unreachable"
+    operator: "Exists"
+    effect: "NoExecute"
+    tolerationSeconds: 300
+  - key: "workload"
+    operator: "Equal"
+    value: "kafka"
+    effect: "NoSchedule"

@@ -1,38 +1,10 @@
-# Kafka가 의존하는 메타데이터 관리
-apiVersion: v1
-kind: Service
-metadata:
-  name: zookeeper-headless
-spec:
-  clusterIP: None
-  selector:
-    app: zookeeper
-  ports:
-    - name: client
-      port: {{ .Values.zookeeper.port }}
-      targetPort: {{ .Values.zookeeper.port }}
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: zookeeper-service
-spec:
-  selector:
-    app: zookeeper
-  ports:
-    - name: client
-      port: {{ .Values.zookeeper.port }}
-      targetPort: {{ .Values.zookeeper.port }}
-
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
 spec:
   serviceName: zookeeper-headless
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: zookeeper
@@ -41,40 +13,74 @@ spec:
       labels:
         app: zookeeper
     spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
       {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-
       {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-
-      {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | nindent 8 }}
-      {{- end }}
-
       containers:
         - name: zookeeper
-          image: {{ .Values.zookeeper.image | quote }}
-          imagePullPolicy: IfNotPresent
-
+          image: {{ .Values.zookeeper.image }}
           ports:
-            - name: client
-              containerPort: {{ .Values.zookeeper.port }}
-
+            - containerPort: {{ .Values.zookeeper.clientPort }}
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: leader-election
           env:
             - name: ZOOKEEPER_CLIENT_PORT
-              value: {{ .Values.zookeeper.port | quote }}
+              value: "{{ .Values.zookeeper.clientPort }}"
             - name: ZOOKEEPER_TICK_TIME
               value: "2000"
+            - name: ZOOKEEPER_INIT_LIMIT
+              value: "5"
+            - name: ZOOKEEPER_SYNC_LIMIT
+              value: "2"
+            - name: ZOOKEEPER_SERVERS
+              value: {{ range $i, $j := until (int .Values.replicaCount) }}{{ if $i }};{{ end }}zookeeper-{{ $j }}.zookeeper-headless.{{ $.Release.Namespace }}.svc.cluster.local:2888:3888{{ end }}
+          command:
+            - bash
+            - -c
+            - |
+              ZK_ID=${HOSTNAME##*-}
+              export ZOOKEEPER_SERVER_ID=$((ZK_ID + 1))
+              /etc/confluent/docker/run
+          volumeMounts:
+            - name: zookeeper-data
+              mountPath: /var/lib/zookeeper/data
+  volumeClaimTemplates:
+    - metadata:
+        name: zookeeper-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.zookeeper.storage.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.zookeeper.storage.size }}
 
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "256Mi"
-            limits:
-              cpu: "200m"
-              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-headless
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.zookeeper.clientPort }}
+      targetPort: {{ .Values.zookeeper.clientPort }}
+      name: client
+    - port: 2888
+      targetPort: 2888
+      name: server
+    - port: 3888
+      targetPort: 3888
+      name: leader-election
+  selector:
+    app: zookeeper
