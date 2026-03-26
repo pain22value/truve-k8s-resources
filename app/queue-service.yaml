@@ -11,7 +11,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/minjeongjun/k8s-resources.git
+    repoURL: https://github.com/pain22value/truve-k8s-resources
     targetRevision: HEAD
     path: chart/queue-service
     helm:
