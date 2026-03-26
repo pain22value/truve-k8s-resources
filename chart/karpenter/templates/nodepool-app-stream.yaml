@@ -2,25 +2,26 @@
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
-  name: {{ .Values.appStreamNodePool.name }}
+  name: {{ .Values.appStreamNodePool.name }} # stream/worker 전용 NodePool 이름
 spec:
   weight: {{ .Values.appStreamNodePool.weight }}
 
   template:
     metadata:
-      labels:
+      labels: # 생성된 노드에 stream 전용 라벨 부여
 {{ toYaml .Values.appStreamNodePool.labels | nindent 8 }}
-    spec:
+    spec: # 어떤 AWS 노드 설정을 사용할지 지정
       nodeClassRef:
         group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: {{ .Values.nodeClass.name }}
 
-      requirements:
+      requirements: # 인스턴스 타입, capacity type 등 제약 조건
 {{ toYaml .Values.appStreamNodePool.requirements | nindent 8 }}
 
       {{- with .Values.appStreamNodePool.taints }}
-      taints:
+
+      taints: # stream 전용 워크로드만 들어오게 taint 부여
 {{ toYaml . | nindent 8 }}
       {{- end }}
 

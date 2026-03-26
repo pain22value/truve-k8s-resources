@@ -1,16 +1,15 @@
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
-  name: {{ .Values.nodeClass.name }}
+  name: {{ .Values.nodeClass.name }}            # Karpenter가 AWS 노드를 만들 때 참조하는 노드 클래스 이름
 spec:
-  role: {{ .Values.nodeClass.role }}
-  amiFamily: {{ .Values.nodeClass.amiFamily }}
-
-  subnetSelectorTerms:
+  role: {{ .Values.nodeClass.role }}            # 새 EC2 노드에 연결할 IAM Role
+  amiFamily: {{ .Values.nodeClass.amiFamily }}  # 사용할 OS/AMI 계열
+  subnetSelectorTerms: # 노드를 띄울 subnet 선택 조건
 {{ toYaml .Values.nodeClass.subnetSelectorTerms | nindent 4 }}
-
-  securityGroupSelectorTerms:
+  
+  securityGroupSelectorTerms: # 노드에 붙일 security group 선택 조건
 {{ toYaml .Values.nodeClass.securityGroupSelectorTerms | nindent 4 }}
 
-  tags:
+  tags: # 노드에 붙일 security group 선택 조건
 {{ toYaml .Values.nodeClass.tags | nindent 4 }}

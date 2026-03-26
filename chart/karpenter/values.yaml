@@ -1,55 +1,60 @@
 clusterName: truve-eks-dev
 
 nodeClass:
-  name: default
-  role: truve-dev-karpenter-node-role
+  # EC2NodeClass 이름
+  name: default # NodePool이 이 이름을 참조해서 어떤 AWS 설정으로 노드를 띄울지 결정함.
 
-  subnetSelectorTerms:
+  # Terraform에서 만든 Karpenter node role 이름
+  role: truve-dev-karpenter-node-role # 실제 새 노드가 EC2로 생성될 때 사용할 IAM Role
+
+  subnetSelectorTerms: # 어떤 subnet에 노드를 띄울지 태그로 선택
     - tags:
         karpenter.sh/discovery: truve-eks-dev
 
-  securityGroupSelectorTerms:
+  securityGroupSelectorTerms: # 어떤 security group을 노드에 붙일지 태그로 선택
     - tags:
         karpenter.sh/discovery: truve-eks-dev
 
-  amiFamily: AL2023
+  amiFamily: AL2023 # 새 노드의 AMI 계열
 
-  tags:
+  tags: # 새로 생성되는 EC2 노드에 붙일 태그
     Project: truve
     Environment: dev
     ManagedBy: karpenter
 
 appGeneralNodePool:
-  enabled: true
-  name: app-general
-  weight: 10
+  enabled: true # 일반 앱용 NodePool 생성 여부
+  name: app-general # NodePool 이름
+  weight: 10 # 여러 NodePool이 있을 때 우선순위/선호도 느낌으로 사용
 
-  labels:
-    workload: app
+  labels: # 생성된 노드에 붙는 라벨
+    workload: app # 앱 파드가 nodeSelector/affinity로 활용 가능
     node-type: general
 
-  taints: []
+  taints: [] # 일반 앱은 전용 taint 없이 공유 가능하게 둠
 
-  requirements:
+  requirements: # 이 NodePool이 전체적으로 얼마나 커질 수 있는지 상한
     - key: kubernetes.io/arch
       operator: In
       values: ['amd64']
+
     - key: karpenter.sh/capacity-type
       operator: In
       values: ['spot', 'on-demand']
+
     - key: node.kubernetes.io/instance-type
       operator: In
       values: ['t3.large', 't3a.large', 'm6i.large']
 
-  limits:
+  limits: # 이 NodePool이 전체적으로 얼마나 커질 수 있는지 상한
     cpu: '100'
     memory: 200Gi
 
   disruption:
-    consolidationPolicy: WhenEmptyOrUnderutilized
-    consolidateAfter: 60s
+    consolidationPolicy: WhenEmptyOrUnderutilized # 비어있거나 덜 쓰는 노드를 정리하는 정책
+    consolidateAfter: 60s # 정리 판단까지 대기 시간
 
-appStreamNodePool:
+appStreamNodePool: # Kafka consumer, worker, stream 처리용 NodePool
   enabled: true
   name: app-stream
   weight: 20
@@ -58,7 +63,7 @@ appStreamNodePool:
     workload: stream
     node-type: stream
 
-  taints:
+  taints: # stream 전용 워크로드만 올라가게 하는 목적
     - key: workload
       value: stream
       effect: NoSchedule

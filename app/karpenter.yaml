@@ -20,5 +20,6 @@ spec:
 
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: true # Git에서 삭제되면 클러스터에서도 삭제
+      selfHeal: true # 클러스터에서 수동 변경돼도 Git 상태로 복원
+

@@ -1,38 +1,72 @@
+# ScalerObject를 생성할 namespace
 namespace: default
 
 triggerAuthentication:
+  # 외부 인증이 필요한 scaler면 true로 바꾸고 사용하면 됨
   enabled: false
+
+  # TriggerAuthentication 이름
   name: keda-trigger-auth
 
 appApi:
+  # app API용 ScaledObject 생성 여부
   enabled: true
+
+  # 생성될 ScaledObject 이름
   name: app-api
+
+  # 실제로 scale 대상이 되는 Deployment 이름
   targetName: app-api
 
+  # 최소/최대 파드 수
   minReplicaCount: 1
   maxReplicaCount: 10
+
+  # KEDA가 메트릭을 확인하는 주기
   pollingInterval: 30
+
+  # scale down 전에 기다리는 시간(초)
   cooldownPeriod: 300
 
   prometheus:
+    # Prometheus 주소
+    # Prometheus가 클러스터 내에 설치돼 있고, Service 이름이 prometheus-operated인 경우
     serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
+
+    # KEDA 내부 메트릭 이름
     metricName: http_requests_per_second
+
+    # 실제 Prometheus 쿼리
     query: sum(rate(http_requests_total{app="app-api"}[2m]))
+
+    # 이 threshold를 넘으면 scale out
     threshold: '20'
 
 worker:
+  # kafka consumer/worker용 ScaledObject 생성 여부
   enabled: true
+
   name: worker
   targetName: worker
 
+  # worker는 이벤트 없으면 0까지 줄일 수 있음
   minReplicaCount: 0
   maxReplicaCount: 20
   pollingInterval: 15
   cooldownPeriod: 120
 
   kafka:
+    # Kafka bootstrap 서버
     bootstrapServers: kafka-service.truve-kafka.svc.cluster.local:9092
+
+    # consumer group 이름
     consumerGroup: worker-group
+
+    # 감시할 topic
     topic: worker-topic
+
+    # lag가 이 값 이상이면 scale out
     lagThreshold: '10'
+
+    # offset reset 정책
     offsetResetPolicy: latest

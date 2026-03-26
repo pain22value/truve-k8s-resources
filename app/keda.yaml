@@ -22,4 +22,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=true # namespace가 없으면 자동으로 생성하도록 하는 옵션
