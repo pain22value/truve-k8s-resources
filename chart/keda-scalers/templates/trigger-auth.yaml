@@ -1,0 +1,9 @@
+{{- if .Values.triggerAuthentication.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ .Values.triggerAuthentication.name }} # KEDA Scaler가 외부 비밀/인증 정보를 참조할 때 사용하는 리소스
+  namespace: {{ .Values.namespace }}
+
+spec: {} # 지금은 비워두고, 추후 secretTargetRef 등 추가 가능 
+{{- end }}

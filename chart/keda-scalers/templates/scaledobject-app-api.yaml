@@ -1,0 +1,23 @@
+{{- if .Values.appApi.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Values.appApi.name }} # ScaledObject 이름
+  namespace: {{ .Values.namespace }}
+spec:
+  scaleTargetRef:
+    name: {{ .Values.appApi.targetName }} # 실제 replica 수를 조절할 Deployment 이름
+
+  minReplicaCount: {{ .Values.appApi.minReplicaCount }} # 최소 replica 수
+  maxReplicaCount: {{ .Values.appApi.maxReplicaCount }} # 최대 replica 수
+  pollingInterval: {{ .Values.appApi.pollingInterval }} # 메트릭 확인 주기
+  cooldownPeriod: {{ .Values.appApi.cooldownPeriod }} # scale down 전 대기 시간
+
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.appApi.prometheus.serverAddress | quote }}   # 어느 Prometheus에서 메트릭을 읽을지
+        metricName: {{ .Values.appApi.prometheus.metricName | quote }}
+        query: {{ .Values.appApi.prometheus.query | quote }}
+        threshold: {{ .Values.appApi.prometheus.threshold | quote }}
+{{- end }}

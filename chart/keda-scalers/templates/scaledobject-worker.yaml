@@ -1,0 +1,24 @@
+{{- if .Values.worker.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Values.worker.name }}         # Kafka worker용 ScaledObject 이름
+  namespace: {{ .Values.namespace }}
+spec:
+  scaleTargetRef:
+    name: {{ .Values.worker.targetName }} # 실제 replica 수를 조절할 Deployment 이름
+
+  minReplicaCount: {{ .Values.worker.minReplicaCount }}
+  maxReplicaCount: {{ .Values.worker.maxReplicaCount }}
+  pollingInterval: {{ .Values.worker.pollingInterval }}
+  cooldownPeriod: {{ .Values.worker.cooldownPeriod }}
+
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: {{ .Values.worker.kafka.bootstrapServers | quote }} # Kafka bootstrap 서버 주소
+        consumerGroup: {{ .Values.worker.kafka.consumerGroup | quote }} # lag를 볼 consumer group 이름
+        topic: {{ .Values.worker.kafka.topic | quote }} # 감시할 topic 이름
+        lagThreshold: {{ .Values.worker.kafka.lagThreshold | quote }} # lag 임계치
+        offsetResetPolicy: {{ .Values.worker.kafka.offsetResetPolicy | quote }} # offset 초기화 정책
+{{- end }}
