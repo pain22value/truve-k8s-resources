@@ -13,13 +13,7 @@ spec:
         app: auth-service
     spec:
       nodeSelector:
-        workload: stream
-
-      tolerations:
-        - key: "workload"
-          operator: "Equal"
-          value: "stream"
-          effect: "NoSchedule"
+        workload: app
 
       initContainers:
         - name: copy-otel-agent
