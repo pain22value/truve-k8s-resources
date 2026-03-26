@@ -8,21 +8,18 @@ spec:
 
   template:
     metadata:
-      labels: # 이 NodePool로 생성된 노드에 붙는 라벨
-{{ toYaml .Values.appGeneralNodePool.labels | nindent 8 }}
+      labels: {{ toYaml .Values.appGeneralNodePool.labels | nindent 8 }} # 이 NodePool로 생성된 노드에 붙는 라벨
 
-    spec: # 어떤 EC2NodeClass 설정으로 노드를 만들지 연결
-      nodeClassRef:
+    spec:
+      nodeClassRef: # 어떤 EC2NodeClass 설정으로 노드를 만들지 연결
         group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: {{ .Values.nodeClass.name }}
 
-      requirements: # 노드 생성 시 만족해야 하는 제약 조건
-{{ toYaml .Values.appGeneralNodePool.requirements | nindent 8 }}
+      requirements: {{ toYaml .Values.appGeneralNodePool.requirements | nindent 8 }} # 노드 생성 시 만족해야 하는 제약 조건
 
       {{- with .Values.appGeneralNodePool.taints }}
-      taints: # 특정 워크로드만 올라오게 하는 제약
-{{ toYaml . | nindent 8 }}
+      taints: {{ toYaml . | nindent 8 }} # 특정 워크로드만 올라오게 하는 제약
       {{- end }}
 
   disruption:
@@ -30,6 +27,5 @@ spec:
 
     consolidateAfter: {{ .Values.appGeneralNodePool.disruption.consolidateAfter }} # 노드 통합/정리 시작까지 대기 시간
 
-  limits: # NodePool 전체 확장 상한
-{{ toYaml .Values.appGeneralNodePool.limits | nindent 4 }}
+  limits: {{ toYaml .Values.appGeneralNodePool.limits | nindent 4 }} 
 {{- end }}

@@ -3,9 +3,11 @@ clusterName: truve-eks-dev
 nodeClass:
   # EC2NodeClass 이름
   name: default # NodePool이 이 이름을 참조해서 어떤 AWS 설정으로 노드를 띄울지 결정함.
+  role: truve-dev-karpenter-node-role # Terraform에서 만든 Karpenter node role 이름: 실제 새 노드가 EC2로 생성될 때 사용할 IAM Role
 
-  # Terraform에서 만든 Karpenter node role 이름
-  role: truve-dev-karpenter-node-role # 실제 새 노드가 EC2로 생성될 때 사용할 IAM Role
+  amiFamily: AL2023 # 새 노드의 AMI 계열
+  amiSelectorTerms:
+    - alias: al2023@latest
 
   subnetSelectorTerms: # 어떤 subnet에 노드를 띄울지 태그로 선택
     - tags:
@@ -14,8 +16,6 @@ nodeClass:
   securityGroupSelectorTerms: # 어떤 security group을 노드에 붙일지 태그로 선택
     - tags:
         karpenter.sh/discovery: truve-eks-dev
-
-  amiFamily: AL2023 # 새 노드의 AMI 계열
 
   tags: # 새로 생성되는 EC2 노드에 붙일 태그
     Project: truve
