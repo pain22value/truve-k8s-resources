@@ -1,0 +1,53 @@
+replicaCount: 6
+
+image:
+  repository: redis
+  tag: "7.0.0-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 6379
+
+persistence:
+  enabled: true
+  storageClass: "gp3"
+  size: 10Gi
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+config:
+  maxmemory: 400mb
+  maxmemoryPolicy: allkeys-lru
+  appendonly: "yes"
+  save: "900 1 300 10 60 10000"
+  clusterEnabled: "yes"
+  clusterNodeTimeout: "5000"
+
+nodeSelector:
+  workload: redis
+
+tolerations:
+  - key: "workload"
+    operator: "Equal"
+    value: "redis"
+    effect: "NoSchedule"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - redis
+          topologyKey: "kubernetes.io/hostname"
