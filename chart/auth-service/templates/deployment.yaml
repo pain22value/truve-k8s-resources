@@ -13,12 +13,12 @@ spec:
         app: auth-service
     spec:
       nodeSelector:
-        workload: app
+        workload: stream
 
       tolerations:
         - key: "workload"
           operator: "Equal"
-          value: "app"
+          value: "stream"
           effect: "NoSchedule"
 
       initContainers:
