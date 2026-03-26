@@ -53,6 +53,8 @@ spec:
               value: "ticketing-service"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector-opentelemetry-collector.observability:4317"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
             - name: JAVA_TOOL_OPTIONS
               value: "-javaagent:/otel/opentelemetry-javaagent.jar"
 
