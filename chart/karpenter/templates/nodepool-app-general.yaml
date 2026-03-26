@@ -1,0 +1,33 @@
+{{- if .Values.appGeneralNodePool.enabled }}
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: {{ .Values.appGeneralNodePool.name }}
+spec:
+  weight: {{ .Values.appGeneralNodePool.weight }}
+
+  template:
+    metadata:
+      labels:
+{{ toYaml .Values.appGeneralNodePool.labels | nindent 8 }}
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: {{ .Values.nodeClass.name }}
+
+      requirements:
+{{ toYaml .Values.appGeneralNodePool.requirements | nindent 8 }}
+
+      {{- with .Values.appGeneralNodePool.taints }}
+      taints:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+
+  disruption:
+    consolidationPolicy: {{ .Values.appGeneralNodePool.disruption.consolidationPolicy }}
+    consolidateAfter: {{ .Values.appGeneralNodePool.disruption.consolidateAfter }}
+
+  limits:
+{{ toYaml .Values.appGeneralNodePool.limits | nindent 4 }}
+{{- end }}

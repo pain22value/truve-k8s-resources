@@ -1,0 +1,83 @@
+clusterName: truve-eks-dev
+
+nodeClass:
+  name: default
+  role: truve-dev-karpenter-node-role
+
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: truve-eks-dev
+
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: truve-eks-dev
+
+  amiFamily: AL2023
+
+  tags:
+    Project: truve
+    Environment: dev
+    ManagedBy: karpenter
+
+appGeneralNodePool:
+  enabled: true
+  name: app-general
+  weight: 10
+
+  labels:
+    workload: app
+    node-type: general
+
+  taints: []
+
+  requirements:
+    - key: kubernetes.io/arch
+      operator: In
+      values: ['amd64']
+    - key: karpenter.sh/capacity-type
+      operator: In
+      values: ['spot', 'on-demand']
+    - key: node.kubernetes.io/instance-type
+      operator: In
+      values: ['t3.large', 't3a.large', 'm6i.large']
+
+  limits:
+    cpu: '100'
+    memory: 200Gi
+
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 60s
+
+appStreamNodePool:
+  enabled: true
+  name: app-stream
+  weight: 20
+
+  labels:
+    workload: stream
+    node-type: stream
+
+  taints:
+    - key: workload
+      value: stream
+      effect: NoSchedule
+
+  requirements:
+    - key: kubernetes.io/arch
+      operator: In
+      values: ['amd64']
+    - key: karpenter.sh/capacity-type
+      operator: In
+      values: ['on-demand', 'spot']
+    - key: node.kubernetes.io/instance-type
+      operator: In
+      values: ['m6i.large', 'm5.large', 't3.large']
+
+  limits:
+    cpu: '100'
+    memory: 300Gi
+
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 120s
