@@ -36,5 +36,5 @@ config:
   queue_server_uri: "http://queue-service.truve-queue-service.svc.cluster.local:8083"
   ticketing_server_uri: "http://ticketing-service.truve-ticketing-service.svc.cluster.local:8084"
   musical_server_uri: "http://musical-service.truve-musical-service.svc.cluster.local:8085"
-  user_redis_host: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com"
+  user_redis_host: "redis-headless.truve-redis.svc.cluster.local"
   user_redis_port: "6379"
