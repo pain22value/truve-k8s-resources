@@ -8,27 +8,22 @@ spec:
 
   template:
     metadata:
-      labels: # 생성된 노드에 stream 전용 라벨 부여
-{{ toYaml .Values.appStreamNodePool.labels | nindent 8 }}
-    spec: # 어떤 AWS 노드 설정을 사용할지 지정
-      nodeClassRef:
+      labels: {{ toYaml .Values.appStreamNodePool.labels | nindent 8 }} # 생성된 노드에 stream 전용 라벨 부여
+    spec: 
+      nodeClassRef: # 어떤 AWS 노드 설정을 사용할지 지정
         group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: {{ .Values.nodeClass.name }}
 
-      requirements: # 인스턴스 타입, capacity type 등 제약 조건
-{{ toYaml .Values.appStreamNodePool.requirements | nindent 8 }}
+      requirements: {{ toYaml .Values.appStreamNodePool.requirements | nindent 8 }} # 인스턴스 타입, capacity type 등 제약 조건
 
       {{- with .Values.appStreamNodePool.taints }}
-
-      taints: # stream 전용 워크로드만 들어오게 taint 부여
-{{ toYaml . | nindent 8 }}
+      taints: {{ toYaml . | nindent 8 }} # stream 전용 워크로드만 들어오게 taint 부여
       {{- end }}
 
   disruption:
     consolidationPolicy: {{ .Values.appStreamNodePool.disruption.consolidationPolicy }}
     consolidateAfter: {{ .Values.appStreamNodePool.disruption.consolidateAfter }}
 
-  limits:
-{{ toYaml .Values.appStreamNodePool.limits | nindent 4 }}
+  limits: {{ toYaml .Values.appStreamNodePool.limits | nindent 4 }} 
 {{- end }}
