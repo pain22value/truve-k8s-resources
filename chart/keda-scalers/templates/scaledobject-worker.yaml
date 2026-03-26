@@ -2,11 +2,11 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: {{ .Values.worker.name }}         # Kafka worker용 ScaledObject 이름
+  name: {{ .Values.worker.name | quote }}         # Kafka worker용 ScaledObject 이름
   namespace: {{ .Values.namespace }}
 spec:
   scaleTargetRef:
-    name: {{ .Values.worker.targetName }} # 실제 replica 수를 조절할 Deployment 이름
+    name: {{ .Values.worker.targetName | quote }} # 실제 replica 수를 조절할 Deployment 이름
 
   minReplicaCount: {{ .Values.worker.minReplicaCount }}
   maxReplicaCount: {{ .Values.worker.maxReplicaCount }}

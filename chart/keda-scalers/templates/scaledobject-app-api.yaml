@@ -2,11 +2,11 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: {{ .Values.appApi.name }} # ScaledObject 이름
+  name: {{ .Values.appApi.name | quote }} # ScaledObject 이름
   namespace: {{ .Values.namespace }}
 spec:
   scaleTargetRef:
-    name: {{ .Values.appApi.targetName }} # 실제 replica 수를 조절할 Deployment 이름
+    name: {{ .Values.appApi.targetName | quote }} # 실제 replica 수를 조절할 Deployment 이름
 
   minReplicaCount: {{ .Values.appApi.minReplicaCount }} # 최소 replica 수
   maxReplicaCount: {{ .Values.appApi.maxReplicaCount }} # 최대 replica 수
