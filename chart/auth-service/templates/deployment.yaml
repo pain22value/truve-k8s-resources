@@ -14,33 +14,28 @@ spec:
     spec:
       nodeSelector:
         workload: app
+        node-type: general
 
-      tolerations:
-        - key: "workload"
-          operator: "Equal"
-          value: "app"
-          effect: "NoSchedule"
-
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                  - key: karpenter.sh/capacity-type
-                    operator: In
-                    values: ["on-demand"]
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - auth-service
-                topologyKey: "topology.kubernetes.io/zone"
+#      affinity:
+#        nodeAffinity:
+#          preferredDuringSchedulingIgnoredDuringExecution:
+#            - weight: 100
+#              preference:
+#                matchExpressions:
+#                  - key: karpenter.sh/capacity-type
+#                    operator: In
+#                    values: ["on-demand"]
+#        podAntiAffinity:
+#          preferredDuringSchedulingIgnoredDuringExecution:
+#            - weight: 100
+#              podAffinityTerm:
+#                labelSelector:
+#                  matchExpressions:
+#                    - key: app
+#                      operator: In
+#                      values:
+#                        - auth-service
+#                topologyKey: "topology.kubernetes.io/zone"
 
       initContainers:
         - name: copy-otel-agent
