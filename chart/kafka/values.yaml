@@ -17,7 +17,7 @@ kafka:
     storageClassName: gp3
 
 nodeSelector:
-  workload: kafka
+  workload: messaging
 
 tolerations:
   - key: "node.kubernetes.io/not-ready"
@@ -30,5 +30,5 @@ tolerations:
     tolerationSeconds: 300
   - key: "workload"
     operator: "Equal"
-    value: "kafka"
+    value: "messaging"
     effect: "NoSchedule"

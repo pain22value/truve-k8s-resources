@@ -31,12 +31,12 @@ config:
   clusterNodeTimeout: "5000"
 
 nodeSelector:
-  workload: redis
+  workload: messaging
 
 tolerations:
   - key: "workload"
     operator: "Equal"
-    value: "redis"
+    value: "messaging"
     effect: "NoSchedule"
 
 affinity:
