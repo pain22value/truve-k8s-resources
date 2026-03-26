@@ -51,7 +51,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: "auth-service"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://otel-collector.monitoring.svc.cluster.local:4317"
+              value: "http://otel-collector-opentelemetry-collector.observability:4317"
             - name: JAVA_TOOL_OPTIONS
               value: "-javaagent:/otel/opentelemetry-javaagent.jar"
 
