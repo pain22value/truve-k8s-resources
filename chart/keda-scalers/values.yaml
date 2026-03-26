@@ -1,0 +1,38 @@
+namespace: default
+
+triggerAuthentication:
+  enabled: false
+  name: keda-trigger-auth
+
+appApi:
+  enabled: true
+  name: app-api
+  targetName: app-api
+
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  pollingInterval: 30
+  cooldownPeriod: 300
+
+  prometheus:
+    serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    metricName: http_requests_per_second
+    query: sum(rate(http_requests_total{app="app-api"}[2m]))
+    threshold: '20'
+
+worker:
+  enabled: true
+  name: worker
+  targetName: worker
+
+  minReplicaCount: 0
+  maxReplicaCount: 20
+  pollingInterval: 15
+  cooldownPeriod: 120
+
+  kafka:
+    bootstrapServers: kafka-service.truve-kafka.svc.cluster.local:9092
+    consumerGroup: worker-group
+    topic: worker-topic
+    lagThreshold: '10'
+    offsetResetPolicy: latest

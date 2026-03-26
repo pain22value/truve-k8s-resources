@@ -1,0 +1,24 @@
+{{- if .Values.worker.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Values.worker.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  scaleTargetRef:
+    name: {{ .Values.worker.targetName }}
+
+  minReplicaCount: {{ .Values.worker.minReplicaCount }}
+  maxReplicaCount: {{ .Values.worker.maxReplicaCount }}
+  pollingInterval: {{ .Values.worker.pollingInterval }}
+  cooldownPeriod: {{ .Values.worker.cooldownPeriod }}
+
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: {{ .Values.worker.kafka.bootstrapServers | quote }}
+        consumerGroup: {{ .Values.worker.kafka.consumerGroup | quote }}
+        topic: {{ .Values.worker.kafka.topic | quote }}
+        lagThreshold: {{ .Values.worker.kafka.lagThreshold | quote }}
+        offsetResetPolicy: {{ .Values.worker.kafka.offsetResetPolicy | quote }}
+{{- end }}

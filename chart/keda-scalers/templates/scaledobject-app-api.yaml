@@ -1,0 +1,23 @@
+{{- if .Values.appApi.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Values.appApi.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  scaleTargetRef:
+    name: {{ .Values.appApi.targetName }}
+
+  minReplicaCount: {{ .Values.appApi.minReplicaCount }}
+  maxReplicaCount: {{ .Values.appApi.maxReplicaCount }}
+  pollingInterval: {{ .Values.appApi.pollingInterval }}
+  cooldownPeriod: {{ .Values.appApi.cooldownPeriod }}
+
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.appApi.prometheus.serverAddress | quote }}
+        metricName: {{ .Values.appApi.prometheus.metricName | quote }}
+        query: {{ .Values.appApi.prometheus.query | quote }}
+        threshold: {{ .Values.appApi.prometheus.threshold | quote }}
+{{- end }}
