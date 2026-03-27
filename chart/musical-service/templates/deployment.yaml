@@ -54,7 +54,7 @@ spec:
 
           envFrom:
             - secretRef:
-                name: {{ .Release.Name }}-musical-secrets
+                name: musical-service-secret
 
           volumeMounts:
             - name: config-volume

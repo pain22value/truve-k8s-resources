@@ -59,7 +59,7 @@ spec:
 
           envFrom:
             - secretRef:
-                name: {{ .Release.Name }}-auth-secrets
+                name: auth-service-secret
 
           volumeMounts:
             - name: config-volume

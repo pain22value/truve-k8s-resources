@@ -60,7 +60,7 @@ spec:
 
           envFrom:
             - secretRef:
-                name: {{ .Release.Name }}-ticketing-secrets
+                name: ticketing-service-secret
 
           volumeMounts:
             - name: config-volume

@@ -54,7 +54,7 @@ spec:
 
           envFrom:
             - secretRef:
-                name: {{ .Release.Name }}-queue-secrets
+                name: queue-service-secret
 
           volumeMounts:
             - name: config-volume
