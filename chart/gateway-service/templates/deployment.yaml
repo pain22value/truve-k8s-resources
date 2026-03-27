@@ -83,14 +83,19 @@ spec:
 
             - name: SPRINGDOC_SWAGGER_UI_URLS_5_NAME
               value: "06-Musical Service"
+
             - name: SPRINGDOC_SWAGGER_UI_URLS_5_URL
-              value: "/api/shows/v3/api-docs"
+              value: "/api/musical/v3/api-docs"
+
             - name: OTEL_SERVICE_NAME
               value: "gateway-service"
+
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector-opentelemetry-collector.observability:4317"
+
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
+
             - name: JAVA_TOOL_OPTIONS
               value: "-javaagent:/otel/opentelemetry-javaagent.jar"
 
