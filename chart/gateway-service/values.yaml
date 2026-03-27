@@ -23,7 +23,6 @@ ingress:
     alb.ingress.kubernetes.io/healthcheck-path: /
     alb.ingress.kubernetes.io/healthcheck-port: "8080"
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
-    alb.ingress.kubernetes.io/load-balancer-attributes: deletion_protection.enabled=true
   hosts:
     - host: gateway.truve.site
       paths:
