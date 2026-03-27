@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: common-resources
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/pain22value/truve-k8s-resources
+    targetRevision: HEAD
+    path: chart/common
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
