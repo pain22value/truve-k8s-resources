@@ -12,6 +12,15 @@ spec:
     targetRevision: 2.19.0
     helm:
       releaseName: keda
+      values: |
+        nodeSelector:
+          workload: system
+
+        tolerations:
+          - key: workload
+            operator: Equal
+            value: system
+            effect: NoSchedule
 
   destination:
     server: https://kubernetes.default.svc
