@@ -14,7 +14,6 @@ spec:
     spec:
       nodeSelector:
         workload: app
-        node-type: general
 
       initContainers:
         - name: copy-otel-agent
