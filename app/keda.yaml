@@ -23,4 +23,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true # namespace가 없으면 자동으로 생성하도록 하는 옵션
-      - SeverSideApply=true # KEDA Helm 차트는 Server-Side Apply를 활용하여 리소스를 관리하므로 이 옵션을 활성화해야 함
+      - ServerSideApply=true # KEDA Helm 차트는 Server-Side Apply를 활용하여 리소스를 관리하므로 이 옵션을 활성화해야 함

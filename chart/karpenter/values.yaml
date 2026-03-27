@@ -40,7 +40,7 @@ appGeneralNodePool:
 
     - key: karpenter.sh/capacity-type
       operator: In
-      values: ['spot', 'on-demand']
+      values: ['on-demand']
 
     - key: node.kubernetes.io/instance-type
       operator: In
@@ -74,7 +74,7 @@ appStreamNodePool: # Kafka consumer, worker, stream 처리용 NodePool
       values: ['amd64']
     - key: karpenter.sh/capacity-type
       operator: In
-      values: ['on-demand', 'spot']
+      values: ['spot']
     - key: node.kubernetes.io/instance-type
       operator: In
       values: ['m6i.large', 'm5.large', 't3.large']
