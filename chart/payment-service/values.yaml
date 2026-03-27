@@ -17,6 +17,7 @@ config:
   logging.level.io.lettuce.core: "DEBUG"
   SPRING_PROFILES_ACTIVE: "prod"
   SPRING_DATASOURCE_URL: "jdbc:mysql://dev-mysql.c14q2m426g1v.ap-northeast-2.rds.amazonaws.com:3306/payment_db"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka.truve-kafka.svc.cluster.local:9092"
   SPRING_DATA_REDIS_CLUSTER_NODES: "redis-headless.truve-redis.svc.cluster.local:6379"
   SPRING_DATA_REDIS_CLUSTER_MAX_REDIRECTS: "10"
   SPRING_DATA_REDIS_CLUSTER_REFRESH_ADAPTIVE: "true"
