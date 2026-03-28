@@ -5,20 +5,17 @@ triggerAuthentication:
 scaledObjects: # 여러 ScaledObject 설정을 한 곳에서 관리하기 위한 구조
   - name: gateway-service-gateway-service
     namespace: truve-gateway-service
-    enabled: true # app API용 ScaledObject 생성 여부
+    enabled: true # ScaledObject 생성 여부
     scaleTargetRef:
-      name: gateway-service-gateway-service # 실제로 scale 대상이 되는 Deployment 이름
-    # min~max 파드 범위에서 자동 스케일
+      name: gateway-service-gateway-service
     minReplicaCount: 1
     maxReplicaCount: 10
-    pollingInterval: 30 # KEDA가 메트릭을 확인하는 주기(초)
-    cooldownPeriod: 300 # 트래픽 줄어들었을 때 바로 파드 삭제하지 않고 기다리는 대기 시간(초), Thrashing(잦은 스케일링) 방지
+    pollingInterval: 30
+    cooldownPeriod: 300
     type: prometheus # Prometheus의 HTTP 요청량 기준으로 스케일링
     prometheus:
       serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090 # Prometheus가 클러스터 내에 설치돼 있고, Service 이름이 prometheus-operated인 경우
       metricName: http_requests_per_second # KEDA 내부 메트릭 이름
-
-      # query가 실제 메트릭을 반환하는지 확인
       query: sum(rate(http_requests_total{app="app-api"}[2m])) # app="app-api" 라벨이 붙은 HTTP 요청 수를 2분간의 평균으로 계산
       threshold: '20' # 이 threshold를 넘으면 scale out
 
