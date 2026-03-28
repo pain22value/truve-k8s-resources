@@ -21,7 +21,7 @@ scaledObjects: # 여러 ScaledObject 설정을 한 곳에서 관리하기 위한
 
   - name: queue-service-queue-service # Kafka 기반 스케일링 설정
     namespace: truve-queue-service
-    enabled: true # kafka consumer/worker용 ScaledObject 생성 여부
+    enabled: false # kafka consumer/worker용 ScaledObject 생성 여부
     scaleTargetRef:
       name: queue-service-queue-service
     minReplicaCount: 0 # worker는 이벤트 없으면 0까지 줄일 수 있음
@@ -54,7 +54,7 @@ scaledObjects: # 여러 ScaledObject 설정을 한 곳에서 관리하기 위한
 
   - name: auth-service-auth-service
     namespace: truve-auth-service
-    enabled: false
+    enabled: true
     scaleTargetRef:
       name: auth-service-auth-service
     minReplicaCount: 1
