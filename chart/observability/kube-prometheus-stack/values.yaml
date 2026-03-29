@@ -1,0 +1,70 @@
+grafana:
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    size: 10Gi
+
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      workload: monitoring
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: monitoring
+        effect: NoSchedule
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ['ReadWriteOnce']
+          resources:
+            requests:
+              storage: 50Gi
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      workload: monitoring
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: monitoring
+        effect: NoSchedule
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ['ReadWriteOnce']
+          resources:
+            requests:
+              storage: 10Gi
+
+kubeStateMetrics:
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+
+prometheusOperator:
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+
+nodeExporter:
+  tolerations:
+    - operator: Exists
