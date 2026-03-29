@@ -1,16 +1,16 @@
-aws-ebs-csi-driver:
-  controller:
-    replicaCount: 2
-    serviceAccount:
-      create: true
-      name: ebs-csi-controller-sa
-  storageClasses:
-    - name: gp3
-      annotations:
-        storageclass.kubernetes.io/is-default-class: "true"
-      allowVolumeExpansion: true
-      reclaimPolicy: Delete
-      volumeBindingMode: WaitForFirstConsumer
-      parameters:
-        type: gp3
-        fsType: ext4
+# aws-ebs-csi-driver:
+#   controller:
+#     replicaCount: 2
+#     serviceAccount:
+#       create: true
+#       name: ebs-csi-controller-sa
+#   storageClasses:
+#     - name: gp3
+#       annotations:
+#         storageclass.kubernetes.io/is-default-class: "true"
+#       allowVolumeExpansion: true
+#       reclaimPolicy: Delete
+#       volumeBindingMode: WaitForFirstConsumer
+#       parameters:
+#         type: gp3
+#         fsType: ext4
