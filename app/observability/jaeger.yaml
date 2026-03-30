@@ -11,7 +11,7 @@ spec:
       targetRevision: 3.1.0
       helm:
         valueFiles:
-          - $values/chart/observability/values-jaeger.yaml
+          - $values/chart/observability/jaeger/values.yaml
     - repoURL: https://github.com/pain22value/k8s-resources.git
       targetRevision: HEAD
       ref: values

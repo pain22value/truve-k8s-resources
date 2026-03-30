@@ -1,0 +1,52 @@
+# Jaeger All-in-One 설정 (Query UI + Collector + Agent 통합)
+provisionDataStore:
+  type: memory # 테스트/소규모용으로 메모리 저장 방식 사용 (재시작 시 데이터 초기화)
+
+allInOne:
+  enabled: true
+  image:
+    repository: jaegertracing/all-in-one
+    tag: 1.55.0
+
+  # 모니터링 노드 설정
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+
+  # OTEL Collector로부터 데이터를 받기 위한 포트 설정
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+
+# 외부 접속을 위한 Ingress 설정 (ALB 사용 가정)
+query:
+  enabled: true
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations:
+      alb.ingress.kubernetes.io/group.name: monitoring
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:599476212908:certificate/c777a244-2261-47b1-aea0-0f68c9fb5249
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+    hosts:
+      - jaeger.truve.site
+    paths:
+      - /
+
+# OTEL Collector가 찾을 수 있도록 서비스 이름 고정
+fullnameOverride: jaeger

@@ -11,7 +11,7 @@ spec:
       targetRevision: 2.10.2
       helm:
         valueFiles:
-          - $values/chart/observability/values-loki.yaml
+          - $values/chart/observability/loki/values-.yaml
     - repoURL: https://github.com/pain22value/k8s-resources.git
       targetRevision: HEAD
       ref: values

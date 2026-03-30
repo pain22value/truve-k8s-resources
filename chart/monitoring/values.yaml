@@ -1,72 +1,73 @@
-kube-prometheus-stack:
-  prometheusOperator:
+grafana:
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    accessModes: ['ReadWriteOnce']
+    size: 10Gi
+  adminUser: admin
+  adminPassword: truve#12
+
+prometheus:
+  prometheusSpec:
     nodeSelector:
-      eks.amazonaws.com/nodegroup: truve-monitor-prod-ng
+      workload: monitoring
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: monitoring
+        effect: NoSchedule
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ['ReadWriteOnce']
+          resources:
+            requests:
+              storage: 50Gi
 
-  grafana:
+alertmanager:
+  alertmanagerSpec:
     nodeSelector:
-      eks.amazonaws.com/nodegroup: truve-monitor-prod-ng
-    persistence:
-      enabled: true
-      storageClassName: gp3
-      size: 10Gi
-    ingress:
-      enabled: true
-      ingressClassName: alb
-      annotations:
-        alb.ingress.kubernetes.io/group.name: monitoring
-        alb.ingress.kubernetes.io/scheme: internet-facing
-        alb.ingress.kubernetes.io/target-type: ip
-        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-        alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:599476212908:certificate/c777a244-2261-47b1-aea0-0f68c9fb5249
-        alb.ingress.kubernetes.io/ssl-redirect: "443"
-        alb.ingress.kubernetes.io/success-codes: 200,302
-      hosts:
-        - grafana.truve.site
-      paths:
-        - /
-    sidecar:
-      dashboards:
-        enabled: true
-        label: grafana_dashboard
-        searchNamespace: ALL
+      workload: monitoring
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: monitoring
+        effect: NoSchedule
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ['ReadWriteOnce']
+          resources:
+            requests:
+              storage: 10Gi
 
-  prometheus:
-    prometheusSpec:
-      serviceMonitorSelectorNilUsesHelmValues: false
-      serviceMonitorSelector: {}
-      serviceMonitorNamespaceSelector: {}
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: gp3
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 50Gi
-    ingress:
-      enabled: true
-      ingressClassName: alb
-      annotations:
-        alb.ingress.kubernetes.io/group.name: monitoring
-        alb.ingress.kubernetes.io/scheme: internet-facing
-        alb.ingress.kubernetes.io/target-type: ip
-        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-        alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:599476212908:certificate/c777a244-2261-47b1-aea0-0f68c9fb5249
-        alb.ingress.kubernetes.io/ssl-redirect: "443"
-      hosts:
-        - prometheus.truve.site
-      paths:
-        - /
-      pathType: Prefix
-  
-  alertmanager:
-    alertmanagerSpec:
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: truve-monitor-prod-ng
+kubeStateMetrics:
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
 
-  kube-state-metrics:
-    nodeSelector:
-      eks.amazonaws.com/nodegroup: truve-monitor-prod-ng
+prometheusOperator:
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
 
-  prometheus-node-exporter: {}
+nodeExporter:
+  tolerations:
+    - operator: Exists

@@ -11,7 +11,7 @@ spec:
       targetRevision: 0.130.1
       helm:
         valueFiles:
-          - $values/chart/observability/values-otel.yaml
+          - $values/chart/observability/otel/values.yaml
     - repoURL: https://github.com/pain22value/k8s-resources.git
       targetRevision: HEAD
       ref: values
