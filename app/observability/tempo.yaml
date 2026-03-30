@@ -25,6 +25,7 @@ spec:
       namespace: observability
       jqPathExpressions:
         - .spec.volumeClaimTemplates[].metadata.creationTimestamp
+        - .spec.volumeClaimTemplates[].status # status 필드 전체를 무시 (생성 시점에 따라 달라지는 필드들이 많아서, 일괄적으로 status 전체를 무시하는 게 편할 듯)
   syncPolicy:
     automated:
       prune: true
