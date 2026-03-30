@@ -24,7 +24,7 @@ spec:
       name: tempo
       namespace: observability
       jsonPointers:
-        - .spec.volumeClaimTemplates[].metadata.creationTimestamp
+        - /spec/volumeClaimTemplates/0/metadata/creationTimestamp
   syncPolicy:
     automated:
       prune: true
