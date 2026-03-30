@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: efk-stack
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/pain22value/k8s-resources.git
+    targetRevision: HEAD
+    path: chart/logging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

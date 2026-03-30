@@ -1,0 +1,59 @@
+elasticsearch:
+  clusterName: "logging"
+  replicas: 1
+  persistence:
+    enabled: true
+    storageClass: "gp3"
+    size: 30Gi
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Exists
+      effect: NoSchedule
+  resources:
+    requests: { cpu: "500m", memory: "2Gi" }
+    limits: { cpu: "1000m", memory: "4Gi" }
+  esJavaOpts: "-Xmx2g -Xms2g"
+
+kibana:
+  elasticsearchHosts: "http://elasticsearch-master:9200"
+  nodeSelector:
+    workload: monitoring
+  tolerations:
+    - key: workload
+      operator: Exists
+      effect: NoSchedule
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations:
+      alb.ingress.kubernetes.io/group.name: monitoring
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:599476212908:certificate/c777a244-2261-47b1-aea0-0f68c9fb5249
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+    hosts:
+      - host: kibana.truve.site
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+
+fluent-bit:
+  enabled: true
+  nodeSelector: {}
+  tolerations:
+    - operator: Exists
+  config:
+    outputs: |
+      [OUTPUT]
+          Name            es
+          Match           *
+          Host            elasticsearch-master
+          Port            9200
+          Logstash_Format On
+          Logstash_Prefix truve-logs
+          Time_Key        @timestamp
+          Replace_Dots    On
+          Retry_Limit     False
