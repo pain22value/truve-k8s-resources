@@ -1,31 +1,27 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: otel-collector
-#   namespace: argocd
-# spec:
-#   project: default
-
-#   sources:
-#     - repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
-#       chart: opentelemetry-collector
-#       targetRevision: 0.130.1
-#       helm:
-#         valueFiles:
-#           - $values/observability/otel-collector/values.yaml
-
-#     - repoURL: https://github.com/pain22value/truve-k8s-resources.git
-#       targetRevision: HEAD
-#       ref: values
-
-#   destination:
-#     server: https://kubernetes.default.svc
-#     namespace: observability
-
-#   syncPolicy:
-#     automated:
-#       prune: true
-#       selfHeal: true
-#     syncOptions:
-#       - CreateNamespace=true
-#       - ServerSideApply=true
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-collector
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+      chart: opentelemetry-collector
+      targetRevision: 0.130.1
+      helm:
+        valueFiles:
+          - $values/chart/observability/values-otel.yaml
+    - repoURL: https://github.com/pain22value/k8s-resources.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
