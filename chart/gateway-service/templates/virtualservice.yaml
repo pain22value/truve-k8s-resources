@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Name }}-gateway-vs
+spec:
+  hosts:
+    - "gateway.truve.site"
+  gateways:
+    - istio-system/truve-gateway
+  http:
+    - route:
+        - destination:
+            host: gateway-service
+            port:
+              number: {{ .Values.service.port }}
