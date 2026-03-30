@@ -12,7 +12,7 @@ spec:
       helm:
         valueFiles:
           - $values/chart/observability/jaeger/values.yaml
-    - repoURL: https://github.com/pain22value/k8s-resources.git
+    - repoURL: https://github.com/pain22value/truve-k8s-resources.git
       targetRevision: HEAD
       ref: values
   destination:

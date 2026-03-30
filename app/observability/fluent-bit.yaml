@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/pain22value/k8s-resources.git
+    repoURL: https://github.com/pain22value/truve-k8s-resources.git
     targetRevision: HEAD
     path: chart/fluent-bit
   destination:
