@@ -11,8 +11,7 @@ loki:
     workload: monitoring
   tolerations:
     - key: workload
-      operator: Equal
-      value: monitoring
+      operator: Exists
       effect: NoSchedule
 
   persistence:

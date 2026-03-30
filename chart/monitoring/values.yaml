@@ -3,8 +3,7 @@ grafana:
     workload: monitoring
   tolerations:
     - key: workload
-      operator: Equal
-      value: monitoring
+      operator: Exists
       effect: NoSchedule
   persistence:
     enabled: true
@@ -20,8 +19,7 @@ prometheus:
       workload: monitoring
     tolerations:
       - key: workload
-        operator: Equal
-        value: monitoring
+        operator: Exists
         effect: NoSchedule
     storageSpec:
       volumeClaimTemplate:
@@ -38,8 +36,7 @@ alertmanager:
       workload: monitoring
     tolerations:
       - key: workload
-        operator: Equal
-        value: monitoring
+        operator: Exists
         effect: NoSchedule
     storage:
       volumeClaimTemplate:
@@ -55,8 +52,7 @@ kubeStateMetrics:
     workload: monitoring
   tolerations:
     - key: workload
-      operator: Equal
-      value: monitoring
+      operator: Exists
       effect: NoSchedule
 
 prometheusOperator:
@@ -64,8 +60,7 @@ prometheusOperator:
     workload: monitoring
   tolerations:
     - key: workload
-      operator: Equal
-      value: monitoring
+      operator: Exists
       effect: NoSchedule
 
 nodeExporter:

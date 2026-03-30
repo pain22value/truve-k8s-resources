@@ -1,6 +1,14 @@
 # Jaeger All-in-One 설정
 storage:
-  type: memory # 최상위로 이동
+  type: memory
+
+# 별도의 에이전트 서비스 비활성화 (All-in-one에 포함됨)
+agent:
+  enabled: false
+
+# 별도의 콜렉터 서비스 비활성화 (All-in-one에 포함됨)
+collector:
+  enabled: false
 
 allInOne:
   enabled: true
@@ -13,8 +21,7 @@ allInOne:
     workload: monitoring
   tolerations:
     - key: workload
-      operator: Equal
-      value: monitoring
+      operator: Exists
       effect: NoSchedule
 
   # OTEL Collector로부터 데이터를 받기 위한 포트 설정

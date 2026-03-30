@@ -59,8 +59,7 @@ nodeSelector:
 
 tolerations:
   - key: "workload"
-    operator: "Equal"
-    value: "monitoring"
+    operator: "Exists"
     effect: "NoSchedule"
 
 # Service 설정 추가 (외부/내부 파드가 접근 가능하도록)
