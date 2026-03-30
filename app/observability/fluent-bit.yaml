@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: efk-stack
+  name: fluent-bit
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/pain22value/k8s-resources.git
     targetRevision: HEAD
-    path: chart/logging
+    path: chart/fluent-bit
   destination:
     server: https://kubernetes.default.svc
-    namespace: logging
+    namespace: observability
   syncPolicy:
     automated:
       prune: true

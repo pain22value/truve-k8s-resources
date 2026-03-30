@@ -1,19 +1,22 @@
+# Jaeger All-in-One 설정 (Memory storage)
 storage:
-  type: elasticsearch
-  elasticsearch:
-    host: elasticsearch-master.logging.svc.cluster.local
-    port: 9200
+  type: memory
+
+# 카산드라/엘라스틱서치 비활성화
+cassandra: { enabled: false }
+elasticsearch: { enabled: false }
+
+# 별도의 에이전트 서비스 비활성화 (All-in-one에 포함됨)
+agent: { enabled: false }
+collector: { enabled: false }
 
 allInOne:
-  enabled: false
-
-collector:
   enabled: true
-  replicaCount: 2
-  service:
-    otlp:
-      grpc: { enabled: true }
-      http: { enabled: true }
+  image:
+    repository: jaegertracing/all-in-one
+    tag: 1.55.0
+
+  # 모니터링 노드 설정
   nodeSelector:
     workload: monitoring
   tolerations:
@@ -21,15 +24,22 @@ collector:
       operator: Exists
       effect: NoSchedule
 
+  # OTEL Collector로부터 데이터를 받기 위한 포트 설정
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+
+# 외부 접속용 Ingress
 query:
   enabled: true
-  replicaCount: 2
-  nodeSelector:
-    workload: monitoring
-  tolerations:
-    - key: workload
-      operator: Exists
-      effect: NoSchedule
+  service:
+    type: ClusterIP
   ingress:
     enabled: true
     ingressClassName: alb
@@ -45,6 +55,5 @@ query:
     paths:
       - /
 
-cassandra: { enabled: false }
-
+# 서비스 이름 고정
 fullnameOverride: jaeger
