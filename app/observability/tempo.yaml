@@ -19,8 +19,7 @@ spec:
     server: https://kubernetes.default.svc
     namespace: observability
   ignoreDifferences: # PVC의 생성 시점에 따라 생성 Timestamp가 달라져서 ArgoCD가 null 같은 필드 차이를 OutOfSync로 인식하는 문제 해결
-    - group: apps
-      kind: StatefulSet
+    - kind: StatefulSet
       name: tempo
       namespace: observability
       jsonPointers:
