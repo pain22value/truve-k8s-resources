@@ -30,7 +30,7 @@ config:
         insecure: true
     # Prometheus가 긁어갈 수 있도록 메트릭 노출
     prometheus:
-      endpoint: '0.0.0.0:8889'
+      endpoint: '0.0.0.0:8890'
     # 디버깅용 (로그로 데이터 확인 가능)
     debug: {}
 
