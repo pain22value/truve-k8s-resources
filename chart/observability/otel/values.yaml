@@ -1,0 +1,58 @@
+# mode: deployment
+
+# image:
+#   repository: otel/opentelemetry-collector-contrib
+#   tag: 0.87.0
+
+# config:
+#   receivers:
+#     otlp:
+#       protocols:
+#         grpc: {}
+#         http: {}
+
+#   processors:
+#     memory_limiter:
+#       limit_mib: 512
+#       spike_limit_mib: 128
+#       check_interval: 5s
+#     batch: {}
+
+#   exporters:
+#     otlp:
+#       endpoint: jaeger.observability.svc.cluster.local:4317
+#       tls:
+#         insecure: true
+#     prometheus:
+#       endpoint: '0.0.0.0:8889'
+
+#   extensions:
+#     health_check:
+#       endpoint: '0.0.0.0:13133'
+
+#   service:
+#     extensions: [health_check]
+#     pipelines:
+#       traces:
+#         receivers: [otlp]
+#         processors: [memory_limiter, batch]
+#         exporters: [otlp]
+#       metrics:
+#         receivers: [otlp]
+#         processors: [memory_limiter, batch]
+#         exporters: [prometheus]
+
+# resources:
+#   limits:
+#     memory: 1Gi
+#   requests:
+#     memory: 512Mi
+
+# nodeSelector:
+#   workload: monitoring
+
+# tolerations:
+#   - key: 'workload'
+#     operator: 'Equal'
+#     value: 'monitoring'
+#     effect: 'NoSchedule'
