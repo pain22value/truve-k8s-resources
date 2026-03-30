@@ -1,9 +1,17 @@
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: kye8780/ticketing
   tag: "latest"
   pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: "300m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
 
 service:
   type: ClusterIP
