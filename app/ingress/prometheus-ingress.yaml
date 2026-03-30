@@ -11,6 +11,8 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:ap-northeast-2:599476212908:certificate/c777a244-2261-47b1-aea0-0f68c9fb5249'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/healthcheck-path: /-/healthy
+    alb.ingress.kubernetes.io/success-codes: '200'
 
 spec:
   ingressClassName: alb
