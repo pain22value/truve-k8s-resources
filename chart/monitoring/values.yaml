@@ -13,6 +13,21 @@ grafana:
   adminUser: admin
   adminPassword: truve#12
 
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki.observability.svc.cluster.local:3100
+      jsonData:
+        maxLines: 1000
+    - name: Jaeger
+      type: jaeger
+      access: proxy
+      url: http://jaeger-query.observability.svc.cluster.local:80
+      jsonData:
+        nodeGraph:
+          enabled: true
+
 prometheus:
   prometheusSpec:
     nodeSelector:
