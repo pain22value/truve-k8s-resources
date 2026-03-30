@@ -3,7 +3,6 @@ loki:
   image:
     repository: grafana/loki
     tag: 2.8.2
-    pullPolicy: IfNotPresent
   
   nodeSelector:
     workload: monitoring
@@ -16,8 +15,6 @@ loki:
     enabled: true
     size: 10Gi
     storageClassName: gp3
-    accessModes:
-      - ReadWriteOnce
 
   loki:
     config: |
@@ -25,38 +22,39 @@ loki:
       server:
         http_listen_port: 3100
         log_level: info
-      ingester:
-        wal:
-          enabled: true
-          dir: /loki/wal
-        lifecycler:
-          ring:
-            kvstore:
-              store: inmemory
-            replication_factor: 1
-        chunk_idle_period: 5m
-        max_chunk_age: 1h
+
+      common:
+        path_prefix: /loki
+        replication_factor: 1
+        storage:
+          s3:
+            s3: s3://ap-northeast-2/truve-loki-logs # 생성하신 S3 버킷 이름으로 변경하세요
+            region: ap-northeast-2
+            s3forcepathstyle: true
+
       schema_config:
         configs:
-          - from: 2020-10-24
-            store: boltdb-shipper
-            object_store: filesystem
-            schema: v11
+          - from: 2023-01-01
+            store: tsdb # 최신 TSDB 방식 권장
+            object_store: s3
+            schema: v12
             index:
               prefix: index_
-              period: 168h
+              period: 24h
+
       storage_config:
-        boltdb_shipper:
+        tsdb_shipper:
           active_index_directory: /loki/index
-          cache_location: /loki/cache
-          shared_store: filesystem
-        filesystem:
-          directory: /loki/chunks
+          cache_location: /loki/index/cache
+          shared_store: s3
+
       limits_config:
         enforce_metric_name: false
         reject_old_samples: true
-        reject_old_samples_max_age: 168h
+        reject_old_samples_max_age: 720h
+        allow_structured_metadata: true
 
-# 로그 수집기 (Fluent Bit 사용)
+
+# 로그 수집기 (Fluent Bit으로 대체함)
 promtail:
   enabled: false
