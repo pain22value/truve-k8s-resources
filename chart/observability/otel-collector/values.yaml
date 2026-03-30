@@ -16,7 +16,7 @@ config:
   processors:
     memory_limiter:
       check_interval: 1s
-      limit_mib: 400
+      limit_mib: 850 # 리소스 제한의 약 85%
       spike_limit_mib: 100
     batch:
       send_batch_size: 1000
@@ -39,6 +39,7 @@ config:
       endpoint: 0.0.0.0:13133
 
   service:
+    extensions: [health_check]
     pipelines:
       traces:
         receivers: [otlp]
@@ -65,20 +66,22 @@ tolerations:
     operator: 'Exists'
     effect: 'NoSchedule'
 
-# Service 설정 추가 (외부/내부 파드가 접근 가능하도록)
-ports:
-  otlp-grpc:
-    enabled: true
-    containerPort: 4317
-    servicePort: 4317
-    protocol: TCP
-  otlp-http:
-    enabled: true
-    containerPort: 4318
-    servicePort: 4318
-    protocol: TCP
-  prometheus:
-    enabled: true
-    containerPort: 8889
-    servicePort: 8889
-    protocol: TCP
+##############################################
+# opentelemetry-collector Helm chart는 config 안의 기본 receiver/exporter를 보고 필요한 포트를 자동으로 활성화한다. 공식 문서에도 기본 설정에 따라 포트가 자동으로 켜지고, 필요하면 ports에서 비활성화할 수 있다고 되어 있다. 따라서 ports 설정은 생략하여 기본 포트가 활성화되도록 한다.
+##############################################
+# ports:
+#   otlp-grpc:
+#     enabled: true
+#     containerPort: 4317
+#     servicePort: 4317
+#     protocol: TCP
+#   otlp-http:
+#     enabled: true
+#     containerPort: 4318
+#     servicePort: 4318
+#     protocol: TCP
+#   prometheus:
+#     enabled: true
+#     containerPort: 8889
+#     servicePort: 8889
+#     protocol: TCP
