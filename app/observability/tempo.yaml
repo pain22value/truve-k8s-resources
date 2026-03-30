@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: jaeger
+  name: tempo
   namespace: argocd
 spec:
   project: default
   sources:
-    - repoURL: https://jaegertracing.github.io/helm-charts
-      chart: jaeger
-      targetRevision: 3.1.0
+    - repoURL: https://grafana-community.github.io/helm-charts
+      chart: tempo
+      targetRevision: 1.26.1
       helm:
         valueFiles:
-          - $values/chart/observability/jaeger/values.yaml
+          - $values/chart/observability/tempo/values.yaml
     - repoURL: https://github.com/pain22value/truve-k8s-resources.git
       targetRevision: HEAD
       ref: values
@@ -24,3 +24,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

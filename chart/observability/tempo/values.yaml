@@ -1,0 +1,47 @@
+fullnameOverride: tempo
+
+replicas: 1
+
+persistence:
+  enabled: true
+  storageClassName: gp3
+  size: 20Gi
+
+service:
+  type: ClusterIP
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+nodeSelector:
+  workload: monitoring
+
+tolerations:
+  - key: workload
+    operator: Equal
+    value: monitoring
+    effect: NoSchedule
+
+tempo:
+  reportingEnabled: false
+  searchEnabled: true
+
+  receivers:
+    otlp:
+      protocols:
+        grpc: {}
+        http: {}
+
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+
+  server:
+    http_listen_port: 3200

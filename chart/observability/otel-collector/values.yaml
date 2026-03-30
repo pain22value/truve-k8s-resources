@@ -23,9 +23,9 @@ config:
       timeout: 10s
 
   exporters:
-    # Jaeger로 Traces 데이터 전송
-    otlp/jaeger:
-      endpoint: jaeger-collector.observability.svc.cluster.local:14250
+    # Tempo로 Traces 데이터 전송
+    otlp/tempo:
+      endpoint: tempo.observability.svc.cluster.local:4317
       tls:
         insecure: true
     # Prometheus가 긁어갈 수 있도록 메트릭 노출
@@ -44,7 +44,7 @@ config:
       traces:
         receivers: [otlp]
         processors: [memory_limiter, batch]
-        exporters: [otlp/jaeger, debug]
+        exporters: [otlp/tempo, debug]
       metrics:
         receivers: [otlp]
         processors: [memory_limiter, batch]
