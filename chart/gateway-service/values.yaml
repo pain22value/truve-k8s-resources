@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: kye8780/api-gateway
@@ -37,3 +37,7 @@ config:
   musical_server_uri: "http://musical-service.truve-musical-service.svc.cluster.local:8085"
   user_redis_host: "redis-headless.truve-redis.svc.cluster.local"
   user_redis_port: "6379"
+  spring_data_redis_cluster_nodes: "redis-headless.truve-redis.svc.cluster.local:6379"
+  spring_data_redis_cluster_max_redirects: "10"
+  spring_data_redis_cluster_refresh_adaptive: "true"
+  spring_data_redis_cluster_refresh_period: "30s"

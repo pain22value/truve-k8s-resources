@@ -50,6 +50,14 @@ spec:
               value: {{ .Values.config.user_redis_host | quote }}
             - name: USER_REDIS_PORT
               value: {{ .Values.config.user_redis_port | quote }}
+            - name: SPRING_DATA_REDIS_CLUSTER_NODES
+              value: {{ .Values.config.spring_data_redis_cluster_nodes | quote }}
+            - name: SPRING_DATA_REDIS_CLUSTER_MAX_REDIRECTS
+              value: {{ .Values.config.spring_data_redis_cluster_max_redirects | quote }}
+            - name: SPRING_DATA_REDIS_CLUSTER_REFRESH_ADAPTIVE
+              value: {{ .Values.config.spring_data_redis_cluster_refresh_adaptive | quote }}
+            - name: SPRING_DATA_REDIS_CLUSTER_REFRESH_PERIOD
+              value: {{ .Values.config.spring_data_redis_cluster_refresh_period | quote }}
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
