@@ -2,6 +2,10 @@ fullnameOverride: tempo
 
 replicas: 1
 
+serviceAccount:
+  create: true
+  name: tempo
+
 persistence:
   enabled: true
   storageClassName: gp3
@@ -39,9 +43,14 @@ tempo:
 
   storage:
     trace:
-      backend: local
-      local:
-        path: /var/tempo/traces
+      backend: s3
+      s3:
+        bucket: truve-dev-tempo-trace
+        region: ap-northeast-2
+        # prefix는 선택
+        prefix: tempo
+      # local:
+      #   path: /var/tempo/traces
 
   server:
     http_listen_port: 3200
