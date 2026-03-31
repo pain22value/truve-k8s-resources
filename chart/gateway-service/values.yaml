@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: kye8780/api-gateway
+  repository: 599476212908.dkr.ecr.ap-northeast-2.amazonaws.com/truve/api-gateway
   tag: "latest"
   pullPolicy: IfNotPresent
 

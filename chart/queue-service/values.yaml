@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: kye8780/queue
+  repository: 599476212908.dkr.ecr.ap-northeast-2.amazonaws.com/truve/queue
   tag: "latest"
   pullPolicy: IfNotPresent
 
