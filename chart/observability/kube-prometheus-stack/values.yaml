@@ -13,7 +13,18 @@ grafana:
     size: 10Gi
   adminUser: admin
   adminPassword: truve#12
-  additionalDataSources: # Grafana에서 Tempo를 데이터 소스로 추가하기 위한 설정
+  additionalDataSources: # Grafana에서 Tempo와 Loki를 데이터 소스로 추가하기 위한 설정
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki.observability.svc.cluster.local:3100
+      jsonData:
+        maxLines: 1000
+        derivedFields:
+          - datasourceUid: tempo
+            matcherRegex: "(\\w{32})" # 32자리 TraceID 매칭
+            name: TraceID
+            url: "$${__value.raw}"
     - name: Tempo
       type: tempo
       access: proxy
@@ -21,10 +32,16 @@ grafana:
       isDefault: false
       jsonData:
         httpMethod: GET
+        lokiSearch:
+          datasourceUid: Loki
+        traceQuery:
+          type: traceql
         serviceMap:
-          dataSourceUid: Prometheus # Tempo의 메트릭을 가져올 Prometheus 데이터 소스의 UID (자동 생성되므로 실제 UID로 변경 필요)
+          datasourceUid: Prometheus
+        nodeGraph:
+          enabled: true
         traceToLogsV2:
-          dataSourceUid: loki
+          datasourceUid: Loki
           spanEndTimeShift: '5m'
           tags:
             - key: service.name

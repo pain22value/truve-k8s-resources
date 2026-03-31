@@ -33,7 +33,7 @@ tolerations:
 
 tempo:
   reportingEnabled: false
-  searchEnabled: false # 모놀리식으로 처음 붙이는 단계에서는 검색 기능까지 같이 켜면 readiness가 불안정해질 수 있어서, 초기 안정화는 search 끄고 trace 수집/저장만 먼저 확인하는 게 낫다.
+  searchEnabled: true # 검색 기능을 활성화하여 Grafana Explore에서 트레이스를 검색할 수 있게 합니다.
 
   receivers:
     otlp:
