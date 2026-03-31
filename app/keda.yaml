@@ -5,7 +5,6 @@ metadata:
   namespace: argocd
 spec:
   project: default
-
   source:
     repoURL: https://kedacore.github.io/charts
     chart: keda
@@ -21,11 +20,9 @@ spec:
             operator: Equal
             value: system
             effect: NoSchedule
-
   destination:
     server: https://kubernetes.default.svc
     namespace: keda
-
   syncPolicy:
     automated:
       prune: true

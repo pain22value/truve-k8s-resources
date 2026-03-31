@@ -5,24 +5,20 @@ metadata:
   namespace: argocd
 spec:
   project: default
-
   sources:
     - repoURL: https://kubecost.github.io/kubecost/
       chart: kubecost
       targetRevision: 3.1.4
       helm:
         releaseName: kubecost
-      valueFiles:
-        - $values/chart/kubecost/values.yaml
-
+        valueFiles:
+          - $values/chart/kubecost/values.yaml
     - repoURL: https://github.com/pain22value/truve-k8s-resources.git
       targetRevision: HEAD
       ref: values
-
   destination:
     server: https://kubernetes.default.svc
     namespace: kubecost
-
   syncPolicy:
     automated:
       prune: true
