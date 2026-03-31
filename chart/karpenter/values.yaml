@@ -44,7 +44,7 @@ appGeneralNodePool:
 
     - key: node.kubernetes.io/instance-type
       operator: In
-      values: ['t3.large', 't3a.large', 'm6i.large']
+      values: ['t3.small', 't3.medium', 't3.large', 't3a.large', 'm6i.large']
 
   limits: # 이 NodePool이 전체적으로 얼마나 커질 수 있는지 상한
     cpu: '100'
