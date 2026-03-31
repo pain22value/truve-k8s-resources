@@ -1,0 +1,18 @@
+global:
+  clusterId: truve-eks-dev
+
+nodeSelector:
+  workload: system
+
+tolerations:
+  - key: workload
+    operator: Equal
+    value: system
+    effect: NoSchedule
+
+frontend:
+  service:
+    type: ClusterIP
+
+networkCosts:
+  enabled: false
