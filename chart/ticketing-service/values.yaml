@@ -24,6 +24,7 @@ config:
   logging.level.org.springframework.data.redis: "TRACE"
   logging.level.io.lettuce.core: "DEBUG"
   SPRING_PROFILES_ACTIVE: "prod"
+  PAYMENT_SERVER_URI: "http://payment-service.truve-payment-service.svc.cluster.local:8082"
   SPRING_DATASOURCE_URL: "jdbc:mysql://dev-mysql.c14q2m426g1v.ap-northeast-2.rds.amazonaws.com:3306/ticketing_db"
   SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-service.truve-kafka.svc.cluster.local:9092"
   SPRING_DATA_REDIS_CLUSTER_NODES: "redis-headless.truve-redis.svc.cluster.local:6379"
