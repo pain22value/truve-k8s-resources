@@ -8,6 +8,12 @@ metadata:
     notifications.argoproj.io/subscribe.on-sync-succeeded.slack: C0AKYEYK86Q
     notifications.argoproj.io/subscribe.on-sync-failed.slack: C0AKYEYK86Q
     notifications.argoproj.io/subscribe.on-health-degraded.slack: C0AKYEYK86Q
+    argocd-image-updater.argoproj.io/image-list: truve-api-gateway=599476212908.dkr.ecr.ap-northeast-2.amazonaws.com/truve/api-gateway
+    argocd-image-updater.argoproj.io/truve-api-gateway.update-strategy: latest
+    argocd-image-updater.argoproj.io/truve-api-gateway.allow-tags: |
+      regexp:^[0-9a-f]{40}$
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/write-back-target: helmvalues:chart/gateway-service/values.yaml
 spec:
   project: default
   source:
