@@ -13,6 +13,40 @@ tolerations:
 frontend:
   service:
     type: ClusterIP
+  nodeSelector:
+    workload: system
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: system
+      effect: NoSchedule
 
 networkCosts:
   enabled: false
+
+aggregator:
+  nodeSelector:
+    workload: system
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+forecasting:
+  nodeSelector:
+    workload: system
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+clusterController:
+  nodeSelector:
+    workload: system
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: system
+      effect: NoSchedule

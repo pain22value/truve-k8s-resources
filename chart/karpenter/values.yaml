@@ -55,7 +55,7 @@ appGeneralNodePool:
     consolidateAfter: 60s # 정리 판단까지 대기 시간
 
 appStreamNodePool: # Kafka consumer, worker, stream 처리용 NodePool
-  enabled: true
+  enabled: false
   name: app-stream
   weight: 20
 

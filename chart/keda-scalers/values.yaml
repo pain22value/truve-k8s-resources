@@ -38,7 +38,7 @@ scaledObjects: # 여러 ScaledObject 설정을 한 곳에서 관리하기 위한
 
   - name: ticketing-service-ticketing-service
     namespace: truve-ticketing-service
-    enabled: true
+    enabled: false
     scaleTargetRef:
       name: ticketing-service-ticketing-service
     minReplicaCount: 1
@@ -54,7 +54,7 @@ scaledObjects: # 여러 ScaledObject 설정을 한 곳에서 관리하기 위한
 
   - name: auth-service-auth-service
     namespace: truve-auth-service
-    enabled: true
+    enabled: false
     scaleTargetRef:
       name: auth-service-auth-service
     minReplicaCount: 1
