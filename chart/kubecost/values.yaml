@@ -2,23 +2,23 @@ global:
   clusterId: truve-eks-dev
 
 nodeSelector:
-  workload: system
+  workload: app
 
 tolerations:
-  - key: workload
+  - key: app
     operator: Equal
-    value: system
+    value: app
     effect: NoSchedule
 
 frontend:
   service:
     type: ClusterIP
   nodeSelector:
-    workload: system
+    workload: app
   tolerations:
     - key: workload
       operator: Equal
-      value: system
+      value: app
       effect: NoSchedule
 
 networkCosts:
@@ -26,27 +26,27 @@ networkCosts:
 
 aggregator:
   nodeSelector:
-    workload: system
+    workload: app
   tolerations:
     - key: workload
       operator: Equal
-      value: system
+      value: app
       effect: NoSchedule
 
 forecasting:
   nodeSelector:
-    workload: system
+    workload: app
   tolerations:
     - key: workload
       operator: Equal
-      value: system
+      value: app
       effect: NoSchedule
 
 clusterController:
   nodeSelector:
-    workload: system
+    workload: app
   tolerations:
     - key: workload
       operator: Equal
-      value: system
+      value: app
       effect: NoSchedule
