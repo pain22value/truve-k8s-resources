@@ -1,4 +1,4 @@
-replicaCount: 3
+replicaCount: 1
 
 zookeeper:
   image: "confluentinc/cp-zookeeper:7.5.0"
