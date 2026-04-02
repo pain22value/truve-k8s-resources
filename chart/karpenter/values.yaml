@@ -1,5 +1,3 @@
-replicas: 1
-
 clusterName: truve-eks-dev
 
 nodeClass:
@@ -25,7 +23,7 @@ nodeClass:
     ManagedBy: karpenter
 
 appGeneralNodePool:
-  enabled: true # 일반 앱용 NodePool 생성 여부
+  enabled: false # 일반 앱용 NodePool 생성 여부
   name: app-general # NodePool 이름
   weight: 10 # 여러 NodePool이 있을 때 우선순위/선호도 느낌으로 사용
 
