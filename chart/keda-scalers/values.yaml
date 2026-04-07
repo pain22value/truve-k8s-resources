@@ -2,68 +2,138 @@ triggerAuthentication:
   enabled: false # 외부 인증이 필요한 scaler면 true로 바꾸고 사용하면 됨
   name: keda-trigger-auth # TriggerAuthentication 이름
 
-scaledObjects: # 여러 ScaledObject 설정을 한 곳에서 관리하기 위한 구조
-  - name: gateway-service-gateway-service
+scaledObjects:
+  #####################################################################
+  # gateway-service
+  # 전체 요청이 가장 먼저 들어오는 진입점
+  # 15,000명 부하 시 gateway 포화 여부를 먼저 확인해야 하므로 1차 적용
+  #####################################################################
+  - name: gateway-service
     namespace: truve-gateway-service
-    enabled: true # ScaledObject 생성 여부
+    enabled: true
+
     scaleTargetRef:
       name: gateway-service-gateway-service
+
     minReplicaCount: 1
     maxReplicaCount: 10
     pollingInterval: 30
     cooldownPeriod: 300
-    type: prometheus # Prometheus의 HTTP 요청량 기준으로 스케일링
+
+    type: prometheus
     prometheus:
-      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090 # Prometheus가 클러스터 내에 설치돼 있고, Service 이름이 prometheus-operated인 경우
-      metricName: http_requests_per_second # KEDA 내부 메트릭 이름
-      query: sum(rate(http_requests_total{app="app-api"}[2m])) # app="app-api" 라벨이 붙은 HTTP 요청 수를 2분간의 평균으로 계산
-      threshold: '20' # 이 threshold를 넘으면 scale out
+      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      metricName: gateway_http_requests_per_second
+      threshold: '50'
+      query: |
+        sum(
+          rate(http_requests_total{app="gateway-service"}[1m])
+        )
 
-  - name: queue-service-queue-service # Kafka 기반 스케일링 설정
-    namespace: truve-queue-service
-    enabled: false # kafka consumer/worker용 ScaledObject 생성 여부
-    scaleTargetRef:
-      name: queue-service-queue-service
-    minReplicaCount: 0 # worker는 이벤트 없으면 0까지 줄일 수 있음
-    maxReplicaCount: 20
-    pollingInterval: 15
-    cooldownPeriod: 120
-    type: kafka # Kafka의 lag 기준으로 스케일링
-    kafka:
-      bootstrapServers: kafka-headless.truve-kafka.svc.cluster.local:9092 # Kafka bootstrap 서버 주소
-      consumerGroup: worker-group # lag를 볼 consumer group 이름
-      topic: worker-topic # 감시할 topic 이름
-      lagThreshold: '10' # lag(컨슈머가 아직 읽지 않은 메시지 수)가 이 값 이상이면 scale out
-      offsetResetPolicy: latest # offset 초기화 정책
-
-  - name: ticketing-service-ticketing-service
+  #####################################################################
+  # ticketing-service
+  # 좌석 조회 / 점유 / 예매 요청이 몰릴 핵심 서비스
+  # gateway 다음으로 가장 먼저 병목 가능성이 높음
+  #####################################################################
+  - name: ticketing-service
     namespace: truve-ticketing-service
-    enabled: false
+    enabled: true
+
     scaleTargetRef:
       name: ticketing-service-ticketing-service
+
     minReplicaCount: 1
     maxReplicaCount: 10
     pollingInterval: 30
     cooldownPeriod: 300
+
     type: prometheus
     prometheus:
       serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
-      metricName: http_requests_per_second
-      query: sum(rate(http_requests_total{app="ticketing-service"}[2m]))
-      threshold: '20'
+      metricName: ticketing_http_requests_per_second
+      threshold: '30'
+      query: |
+        sum(
+          rate(http_requests_total{app="ticketing-service"}[1m])
+        )
 
-  - name: auth-service-auth-service
+  #####################################################################
+  # auth-service
+  # 로그인 / 토큰 발급 / 검증 구간이 부하 시작 시 병목이 될 수 있음
+  # 부하테스트 시나리오에 로그인 포함 시 1차 적용 권장
+  #####################################################################
+  - name: auth-service
     namespace: truve-auth-service
-    enabled: false
+    enabled: true
+
     scaleTargetRef:
       name: auth-service-auth-service
+
     minReplicaCount: 1
-    maxReplicaCount: 10
+    maxReplicaCount: 5
     pollingInterval: 30
     cooldownPeriod: 300
+
     type: prometheus
     prometheus:
       serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
-      metricName: http_requests_per_second
-      query: sum(rate(http_requests_total{app="auth-service"}[2m]))
+      metricName: auth_http_requests_per_second
       threshold: '20'
+      query: |
+        sum(
+          rate(http_requests_total{app="auth-service"}[1m])
+        )
+
+  #####################################################################
+  # payment-service
+  # 결제 완료 시나리오까지 부하테스트 범위에 포함될 때 2차 적용
+  # 지금은 false로 두고 후속 튜닝 대상으로 관리
+  #####################################################################
+  - name: payment-service
+    namespace: truve-payment-service
+    enabled: false
+
+    scaleTargetRef:
+      name: payment-service-payment-service
+
+    minReplicaCount: 1
+    maxReplicaCount: 5
+    pollingInterval: 30
+    cooldownPeriod: 300
+
+    type: prometheus
+    prometheus:
+      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      metricName: payment_http_requests_per_second
+      threshold: '10'
+      query: |
+        sum(
+          rate(http_requests_total{app="payment-service"}[1m])
+        )
+
+  #####################################################################
+  # queue-service
+  # 현재는 Kafka 연결/소비 구조 안정화가 먼저라 보류
+  # 나중에 Kafka lag 기준 scaler로 별도 설계
+  #####################################################################
+  - name: queue-service
+    namespace: truve-queue-service
+    enabled: false
+
+    scaleTargetRef:
+      name: queue-service-queue-service
+
+    minReplicaCount: 1
+    maxReplicaCount: 5
+    pollingInterval: 30
+    cooldownPeriod: 300
+
+    type: prometheus
+    prometheus:
+      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      metricName: queue_http_requests_per_second
+      threshold: '10'
+      query: |
+        sum(
+          rate(http_requests_total{app="queue-service"}[1m])
+        )

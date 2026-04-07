@@ -7,7 +7,7 @@ metadata:
   namespace: {{ .namespace | quote }}       # 대상 리소스가 위치한 네임스페이스
 spec:
   scaleTargetRef:                           # 확장의 대상이 되는 리소스 설정
-    name: {{ .scaleTargetRef.name | quote }} # Deployment, StatefulSet 등의 이름
+    name: {{ .scaleTargetRef.name | quote }} # k get deploy -A
 
   minReplicaCount: {{ .minReplicaCount }}   # 최소 복제본 수 (이벤트가 없어도 유지할 최소 개수)
   maxReplicaCount: {{ .maxReplicaCount }}   # 최대 확장 가능한 복제본 수
