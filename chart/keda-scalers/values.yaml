@@ -22,7 +22,7 @@ scaledObjects:
 
     type: prometheus
     prometheus:
-      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: gateway_http_requests_per_second
       threshold: '50'
       query: |
