@@ -36,5 +36,6 @@ config:
   logging.level.io.lettuce.core.protocol: "WARN"
   logging.level.io.lettuce.core.cluster: "WARN"
   logging.level.io.netty: "WARN"
-  logging.level.com.truve: "INFO"
+  logging.level.com.truve: "DEBUG"
   logging.level.root: "INFO"
+  logging.level.org.springframework.web: "DEBUG"
