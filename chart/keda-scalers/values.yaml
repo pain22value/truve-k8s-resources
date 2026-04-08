@@ -49,7 +49,7 @@ scaledObjects:
 
     type: prometheus
     prometheus:
-      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: ticketing_http_requests_per_second
       threshold: '30'
       query: |
@@ -76,7 +76,7 @@ scaledObjects:
 
     type: prometheus
     prometheus:
-      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: auth_http_requests_per_second
       threshold: '20'
       query: |
@@ -103,7 +103,7 @@ scaledObjects:
 
     type: prometheus
     prometheus:
-      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: payment_http_requests_per_second
       threshold: '10'
       query: |
@@ -118,7 +118,7 @@ scaledObjects:
   #####################################################################
   - name: queue-service
     namespace: truve-queue-service
-    enabled: false
+    enabled: true
 
     scaleTargetRef:
       name: queue-service-queue-service
@@ -130,7 +130,7 @@ scaledObjects:
 
     type: prometheus
     prometheus:
-      serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
+      serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: queue_http_requests_per_second
       threshold: '10'
       query: |
