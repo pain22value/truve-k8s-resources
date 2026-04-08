@@ -14,6 +14,12 @@ grafana:
   adminUser: admin
   adminPassword: truve#12
   additionalDataSources: # Grafana에서 Tempo와 Loki를 데이터 소스로 추가하기 위한 설정
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
+      isDefault: true
+
     - name: Loki
       type: loki
       access: proxy
@@ -25,7 +31,8 @@ grafana:
           - datasourceUid: tempo
             matcherRegex: "(\\w{32})" # 32자리 TraceID 매칭
             name: TraceID
-            url: "$${__value.raw}"
+            url: '$${__value.raw}'
+
     - name: Tempo
       type: tempo
       access: proxy
