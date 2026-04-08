@@ -16,25 +16,31 @@ spec:
           global:
             domain: argocd.truve.site
 
-          configs:
-            params:
-              server.insecure: true
-
           server:
             service:
               type: ClusterIP
+            nodeSelector:
+              workload: system
 
           controller:
             replicas: 1
+            nodeSelector:
+              workload: system
 
           repoServer:
             replicas: 1
+            nodeSelector:
+              workload: system
 
           applicationSet:
             replicas: 1
+            nodeSelector:
+              workload: system
 
           redis:
             enabled: true
+            nodeSelector:
+              workload: system
 
           dex:
             enabled: false
