@@ -1,27 +1,27 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: kubecost
-  namespace: argocd
-spec:
-  project: default
-  sources:
-    - repoURL: https://kubecost.github.io/kubecost/
-      chart: kubecost
-      targetRevision: 3.1.4
-      helm:
-        releaseName: kubecost
-        valueFiles:
-          - $values/chart/kubecost/values.yaml
-    - repoURL: https://github.com/pain22value/truve-k8s-resources.git
-      targetRevision: HEAD
-      ref: values
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: kubecost
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: kubecost
+#   namespace: argocd
+# spec:
+#   project: default
+#   sources:
+#     - repoURL: https://kubecost.github.io/kubecost/
+#       chart: kubecost
+#       targetRevision: 3.1.4
+#       helm:
+#         releaseName: kubecost
+#         valueFiles:
+#           - $values/chart/kubecost/values.yaml
+#     - repoURL: https://github.com/pain22value/truve-k8s-resources.git
+#       targetRevision: HEAD
+#       ref: values
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: kubecost
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
