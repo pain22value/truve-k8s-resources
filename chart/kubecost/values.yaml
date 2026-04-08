@@ -1,52 +1,52 @@
-global:
-  clusterId: truve-eks-dev
+# global:
+#   clusterId: truve-eks-dev
 
-nodeSelector:
-  workload: app
+# nodeSelector:
+#   workload: app
 
-tolerations:
-  - key: app
-    operator: Equal
-    value: app
-    effect: NoSchedule
+# tolerations:
+#   - key: app
+#     operator: Equal
+#     value: app
+#     effect: NoSchedule
 
-frontend:
-  service:
-    type: ClusterIP
-  nodeSelector:
-    workload: app
-  tolerations:
-    - key: workload
-      operator: Equal
-      value: app
-      effect: NoSchedule
+# frontend:
+#   service:
+#     type: ClusterIP
+#   nodeSelector:
+#     workload: app
+#   tolerations:
+#     - key: workload
+#       operator: Equal
+#       value: app
+#       effect: NoSchedule
 
-networkCosts:
-  enabled: false
+# networkCosts:
+#   enabled: false
 
-aggregator:
-  nodeSelector:
-    workload: app
-  tolerations:
-    - key: workload
-      operator: Equal
-      value: app
-      effect: NoSchedule
+# aggregator:
+#   nodeSelector:
+#     workload: app
+#   tolerations:
+#     - key: workload
+#       operator: Equal
+#       value: app
+#       effect: NoSchedule
 
-forecasting:
-  nodeSelector:
-    workload: app
-  tolerations:
-    - key: workload
-      operator: Equal
-      value: app
-      effect: NoSchedule
+# forecasting:
+#   nodeSelector:
+#     workload: app
+#   tolerations:
+#     - key: workload
+#       operator: Equal
+#       value: app
+#       effect: NoSchedule
 
-clusterController:
-  nodeSelector:
-    workload: app
-  tolerations:
-    - key: workload
-      operator: Equal
-      value: app
-      effect: NoSchedule
+# clusterController:
+#   nodeSelector:
+#     workload: app
+#   tolerations:
+#     - key: workload
+#       operator: Equal
+#       value: app
+#       effect: NoSchedule

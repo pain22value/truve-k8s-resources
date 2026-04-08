@@ -13,7 +13,7 @@ grafana:
     size: 10Gi
   adminUser: admin
   adminPassword: truve#12
-  additionalDataSources: # Grafana에서 Tempo와 Loki를 데이터 소스로 추가하기 위한 설정
+  additionalDataSources:
     - name: Prometheus
       type: prometheus
       access: proxy

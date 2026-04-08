@@ -1,0 +1,6 @@
+apiVersion: v2
+name: night-day-scheduler
+description: Scheduled day/night scaling for app workloads managed by Karpenter
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

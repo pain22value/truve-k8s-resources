@@ -27,7 +27,7 @@ scaledObjects:
       threshold: '50'
       query: |
         sum(
-          rate(http_requests_total{app="gateway-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="gateway-service"}[1m])
         )
 
   #####################################################################
@@ -54,7 +54,7 @@ scaledObjects:
       threshold: '30'
       query: |
         sum(
-          rate(http_requests_total{app="ticketing-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="ticketing-service"}[1m])
         )
 
   #####################################################################
@@ -81,7 +81,7 @@ scaledObjects:
       threshold: '20'
       query: |
         sum(
-          rate(http_requests_total{app="auth-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="auth-service"}[1m])
         )
 
   #####################################################################
@@ -108,7 +108,7 @@ scaledObjects:
       threshold: '10'
       query: |
         sum(
-          rate(http_requests_total{app="payment-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="payment-service"}[1m])
         )
 
   #####################################################################
@@ -135,5 +135,5 @@ scaledObjects:
       threshold: '10'
       query: |
         sum(
-          rate(http_requests_total{app="queue-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="queue-service"}[1m])
         )

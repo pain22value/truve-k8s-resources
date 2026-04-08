@@ -1,29 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: keda-scalers
+  name: night-day-scheduler
   namespace: argocd
 spec:
   project: default
-  ignoreDifferences:
-    - group: keda.sh
-      kind: ScaledObject
-      jsonPointers:
-        - /metadata/annotations/autoscaling.keda.sh~1paused
-        - /metadata/annotations/autoscaling.keda.sh~1paused-replicas
   source:
     repoURL: https://github.com/pain22value/truve-k8s-resources.git
     targetRevision: HEAD
-    path: chart/keda-scalers
+    path: chart/night-day-scheduler
     helm:
       valueFiles:
         - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: truve-ops
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - RespectIgnoreDifferences=true
+      - CreateNamespace=true

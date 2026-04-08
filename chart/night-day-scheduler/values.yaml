@@ -1,0 +1,48 @@
+image:
+  repository: bitnami/kubectl
+  tag: "1.33.4"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  name: night-day-scheduler
+
+rbac:
+  create: true
+
+schedules:
+  timezone: Asia/Seoul
+  day:
+    cron: "0 9 * * *"
+    baselineReplicas: 1
+  night:
+    cron: "0 21 * * *"
+
+targets:
+  deployments:
+    - namespace: truve-gateway-service
+      name: gateway-service-gateway-service
+      dayReplicas: 1
+    - namespace: truve-auth-service
+      name: auth-service-auth-service
+      dayReplicas: 1
+    - namespace: truve-ticketing-service
+      name: ticketing-service-ticketing-service
+      dayReplicas: 1
+    - namespace: truve-queue-service
+      name: queue-service-queue-service
+      dayReplicas: 1
+    - namespace: truve-payment-service
+      name: payment-service-payment-service
+      dayReplicas: 1
+    - namespace: truve-musical-service
+      name: musical-service-musical-service
+      dayReplicas: 1
+  scaledObjects:
+    - namespace: truve-gateway-service
+      name: gateway-service
+    - namespace: truve-auth-service
+      name: auth-service
+    - namespace: truve-ticketing-service
+      name: ticketing-service
+    - namespace: truve-queue-service
+      name: queue-service

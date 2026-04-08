@@ -16,6 +16,11 @@ metadata:
     argocd-image-updater.argoproj.io/write-back-target: helmvalues:chart/auth-service/values.yaml
 spec:
   project: default
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
   source:
     repoURL: https://github.com/pain22value/truve-k8s-resources
     targetRevision: HEAD
@@ -32,3 +37,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
