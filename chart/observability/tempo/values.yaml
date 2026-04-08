@@ -47,10 +47,8 @@ tempo:
       s3:
         bucket: truve-dev-tempo-trace
         region: ap-northeast-2
-        # prefix는 선택
+        endpoint: s3.ap-northeast-2.amazonaws.com
         prefix: tempo
-      # local:
-      #   path: /var/tempo/traces
 
   server:
     http_listen_port: 3200
