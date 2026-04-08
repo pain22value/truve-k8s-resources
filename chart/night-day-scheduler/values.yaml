@@ -1,6 +1,6 @@
 image:
   repository: bitnami/kubectl
-  tag: "1.33.4-0"
+  tag: "latest"
   pullPolicy: IfNotPresent
 
 serviceAccount:
