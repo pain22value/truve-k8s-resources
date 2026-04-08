@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+spec:
+  project: default
+  sources:
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-cd
+      targetRevision: 7.7.16
+      helm:
+        values: |
+          global:
+            domain: argocd.truve.site
+
+          configs:
+            params:
+              server.insecure: true
+
+          server:
+            service:
+              type: ClusterIP
+
+          controller:
+            replicas: 1
+
+          repoServer:
+            replicas: 1
+
+          applicationSet:
+            replicas: 1
+
+          redis:
+            enabled: true
+
+          dex:
+            enabled: false
+    - repoURL: https://github.com/pain22value/truve-k8s-resources.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
