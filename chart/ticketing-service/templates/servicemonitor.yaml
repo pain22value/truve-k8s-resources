@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ticketing-service
+  labels:
+    app: ticketing-service
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: ticketing-service
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 30s
+      scrapeTimeout: 10s
