@@ -54,6 +54,8 @@ appGeneralNodePool:
     memory: 200Gi
 
   disruption:
+    budgets:
+      - nodes: '1' # 노드 예비/유지보수 시 유지할 최소 노드 수: 1로 설정하면 항상 최소 1대의 노드는 유지하면서 나머지 노드를 정리/통합함.
     consolidationPolicy: WhenEmptyOrUnderutilized # 비어있거나 덜 쓰는 노드를 정리하는 정책
     consolidateAfter: 60s # 정리 판단까지 대기 시간
 

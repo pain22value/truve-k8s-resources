@@ -42,6 +42,14 @@ kubectl get deploy -A -o jsonpath='{range .items[?(@.spec.template.spec.nodeSele
 
 또한 `app-general` NodePool에는 `workload=app:NoSchedule` taint를 적용하고, 실제 서비스 Deployment들에만 같은 toleration을 추가했습니다. 그래서 `external-secrets`, `istiod`, `aws-load-balancer-controller`, `kube-state-metrics` 같은 비앱 파드가 app 노드로 들어와 Karpenter scale down을 막는 상황을 줄일 수 있습니다.
 
+주의할 점은 NodePool template 변경이 기존 노드의 taint를 자동으로 바꾸지는 않는다는 것입니다. 이미 생성된 app 노드에는 수동으로 taint를 넣거나 drain 후 교체가 필요합니다.
+
+```sh
+kubectl taint node <app-node-name> workload=app:NoSchedule
+```
+
+또한 app 노드 수가 적을 때도 비어 있는 노드를 줄일 수 있도록 `app-general` NodePool의 disruption budget은 최소 1대로 설정했습니다.
+
 ## 장애 노드 복구
 
 Terminating 파드 확인:

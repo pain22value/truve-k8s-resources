@@ -26,6 +26,10 @@ spec:
       {{- end }}
 
   disruption:
+    {{- with .Values.appGeneralNodePool.disruption.budgets }}
+    budgets: # 노드 예비/유지보수 시 유지할 최소 노드 수
+{{ toYaml . | nindent 6 }}
+    {{- end }}
     consolidationPolicy: {{ .Values.appGeneralNodePool.disruption.consolidationPolicy | quote }} # 비어있거나 덜 쓰는 노드 정리 정책
 
     consolidateAfter: {{ .Values.appGeneralNodePool.disruption.consolidateAfter | quote }} # 노드 통합/정리 시작까지 대기 시간
