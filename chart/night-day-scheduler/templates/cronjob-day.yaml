@@ -23,12 +23,67 @@ spec:
                 - /bin/sh
                 - -ec
                 - |
-                  echo "[day] scaling app deployments to daytime baseline"
+                  FAILED=0
+                  EXPLICIT_TARGETS_FILE="$(mktemp)"
+                  EXPLICIT_KEYS_FILE="$(mktemp)"
+                  EXCLUDED_KEYS_FILE="$(mktemp)"
+                  ALL_TARGETS_FILE="$(mktemp)"
+
+                  cleanup() {
+                    rm -f "$EXPLICIT_TARGETS_FILE" "$EXPLICIT_KEYS_FILE" "$EXCLUDED_KEYS_FILE" "$ALL_TARGETS_FILE"
+                  }
+
+                  trap cleanup EXIT
+
+                  : > "$EXPLICIT_TARGETS_FILE"
+                  : > "$EXPLICIT_KEYS_FILE"
+                  : > "$EXCLUDED_KEYS_FILE"
+                  : > "$ALL_TARGETS_FILE"
+
                   {{- range .Values.targets.deployments }}
-                  kubectl -n {{ .namespace }} scale deployment/{{ .name }} --replicas={{ default $.Values.schedules.day.baselineReplicas .dayReplicas }}
+                  printf '%s\t%s\t%s\n' '{{ .namespace }}' '{{ .name }}' '{{ default $.Values.schedules.day.baselineReplicas .dayReplicas }}' >> "$EXPLICIT_TARGETS_FILE"
+                  printf '%s/%s\n' '{{ .namespace }}' '{{ .name }}' >> "$EXPLICIT_KEYS_FILE"
                   {{- end }}
+
+                  {{- range .Values.targets.autoDiscoverAppDeployments.excludeDeployments }}
+                  printf '%s/%s\n' '{{ .namespace }}' '{{ .name }}' >> "$EXCLUDED_KEYS_FILE"
+                  {{- end }}
+
+                  cat "$EXPLICIT_TARGETS_FILE" >> "$ALL_TARGETS_FILE"
+
+                  {{- if .Values.targets.autoDiscoverAppDeployments.enabled }}
+                  echo "[day] auto-discovering app deployments with {{ .Values.targets.autoDiscoverAppDeployments.nodeSelectorKey }}={{ .Values.targets.autoDiscoverAppDeployments.nodeSelectorValue }}"
+                  kubectl get deployments -A -o jsonpath='{range .items[?(@.spec.template.spec.nodeSelector.{{ .Values.targets.autoDiscoverAppDeployments.nodeSelectorKey }}=="{{ .Values.targets.autoDiscoverAppDeployments.nodeSelectorValue }}")]}{.metadata.namespace}{"\t"}{.metadata.name}{"\n"}{end}' \
+                  | while IFS="$(printf '\t')" read -r namespace name; do
+                      [ -n "$namespace" ] || continue
+                      key="$namespace/$name"
+
+                      if grep -Fqx "$key" "$EXPLICIT_KEYS_FILE"; then
+                        continue
+                      fi
+
+                      if grep -Fqx "$key" "$EXCLUDED_KEYS_FILE"; then
+                        echo "[day] skipping excluded deployment: $key"
+                        continue
+                      fi
+
+                      printf '%s\t%s\t%s\n' "$namespace" "$name" '{{ default $.Values.schedules.day.baselineReplicas $.Values.targets.autoDiscoverAppDeployments.dayReplicas }}' >> "$ALL_TARGETS_FILE"
+                    done
+                  {{- end }}
+
+                  echo "[day] scaling app deployments to daytime baseline"
+                  while IFS="$(printf '\t')" read -r namespace name replicas; do
+                    [ -n "$namespace" ] || continue
+                    if ! kubectl -n "$namespace" scale deployment/"$name" --replicas="$replicas"; then
+                      FAILED=1
+                    fi
+                  done < "$ALL_TARGETS_FILE"
 
                   echo "[day] resuming KEDA scaled objects"
                   {{- range .Values.targets.scaledObjects }}
-                  kubectl -n {{ .namespace }} annotate scaledobject/{{ .name }} autoscaling.keda.sh/paused- autoscaling.keda.sh/paused-replicas- --overwrite || true
+                  if ! kubectl -n {{ .namespace }} annotate scaledobject/{{ .name }} autoscaling.keda.sh/paused- autoscaling.keda.sh/paused-replicas- --overwrite; then
+                    FAILED=1
+                  fi
                   {{- end }}
+
+                  exit "$FAILED"

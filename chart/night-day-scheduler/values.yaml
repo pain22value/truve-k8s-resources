@@ -18,6 +18,12 @@ schedules:
     cron: '0 21 * * *'
 
 targets:
+  autoDiscoverAppDeployments:
+    enabled: true
+    nodeSelectorKey: workload
+    nodeSelectorValue: app
+    dayReplicas: 1
+    excludeDeployments: []
   deployments:
     - namespace: truve-gateway-service
       name: gateway-service-gateway-service
