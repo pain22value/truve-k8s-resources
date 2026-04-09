@@ -1,12 +1,22 @@
 triggerAuthentication:
-  enabled: false # 외부 인증이 필요한 scaler면 true로 바꾸고 사용하면 됨
+  enabled: false # Prometheus/Kafka 접속에 Secret 기반 인증이 필요할 때만 true로 활성화
   name: keda-trigger-auth # TriggerAuthentication 이름
 
 scaledObjects:
   #####################################################################
+  # 공통 메모
+  # - 이 파일의 threshold는 "전체 서비스 메트릭 총합을 replica 몇 개로 나눌지"를 정하는 기준값이다.
+  #   예: 현재 metric 값이 150, threshold가 75면 KEDA/HPA는 대략 2개 replica를 원한다고 계산한다.
+  # - 따라서 threshold는 "서비스 1개 Pod가 안정적으로 감당 가능한 처리량"에 가깝게 잡는 것이 안전하다.
+  # - 초반에는 보수적으로 낮게 시작하고, 부하테스트 결과(CPU, 메모리, p95/p99 지연시간, 에러율)를 본 뒤 올리거나 내린다.
+  # - Prometheus query는 최근 1분 rate를 사용한다. 순간 스파이크 노이즈를 줄이되, 수 분 단위 평균보다 늦지 않게 반응하려는 선택이다.
+  #####################################################################
+
+  #####################################################################
   # gateway-service
   # 전체 요청이 가장 먼저 들어오는 진입점
-  # 15,000명 부하 시 gateway 포화 여부를 먼저 확인해야 하므로 1차 적용
+  # 외부 요청량을 가장 먼저 받으므로 스케일 아웃 효과를 관찰하기 좋다.
+  # 부하테스트 1차 대상에 두는 이유는 "첫 병목"을 빨리 찾기 쉽기 때문이다.
   #####################################################################
   - name: gateway-service
     namespace: truve-gateway-service
@@ -15,16 +25,16 @@ scaledObjects:
     scaleTargetRef:
       name: gateway-service-gateway-service
 
-    minReplicaCount: 1
-    maxReplicaCount: 20
-    pollingInterval: 15
-    cooldownPeriod: 180
+    minReplicaCount: 1 # 유휴 시간에도 최소 1개는 유지해 cold start를 피한다.
+    maxReplicaCount: 20 # 클러스터 자원 한도 안에서 gateway를 먼저 넉넉히 열어두는 상한
+    pollingInterval: 15 # 15초마다 지표 확인. 너무 짧으면 흔들리고 너무 길면 대응이 늦다.
+    cooldownPeriod: 180 # 급증 직후 바로 축소되지 않도록 3분 대기
 
     type: prometheus
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
-      metricName: gateway_http_requests_per_second
-      threshold: '75' # 15,000명 시 초당 75개의 요청이 들어온다고 가정 (평균 200ms 응답 시간 기준)
+      metricName: gateway_http_requests_per_second # 사람이 읽기 쉬운 외부 메트릭 이름. Prometheus 원본 metric명과 같을 필요는 없다.
+      threshold: '75' # Pod 1개가 약 75 RPS를 안정적으로 처리한다고 가정한 시작점. 부하테스트에서 p95/p99 지연시간과 CPU 여유를 보고 재조정해야 한다.
       query: |
         (
           sum(rate(http_server_request_duration_seconds_count{service_name="gateway-service"}[1m]))
@@ -33,11 +43,15 @@ scaledObjects:
           or
           vector(0)
         )
+      # http_server_*_count 는 "요청 수 카운터"라서 rate()를 적용하면 최근 1분 평균 RPS가 된다.
+      # 서로 다른 Micrometer/Actuator metric 이름을 쓰는 경우를 대비해 둘 중 먼저 잡히는 값을 사용한다.
+      # metric이 아직 없을 때는 vector(0)으로 처리해 쿼리 실패 대신 "부하 없음"으로 간주한다.
 
   #####################################################################
   # ticketing-service
   # 좌석 조회 / 점유 / 예매 요청이 몰릴 핵심 서비스
-  # gateway 다음으로 가장 먼저 병목 가능성이 높음
+  # 실제 비즈니스 로직과 DB 접근이 몰리므로 gateway 다음 병목 후보로 본다.
+  # 읽기/쓰기 혼합 트래픽에서 지연시간이 급격히 늘어나는지 확인하는 대상이다.
   #####################################################################
   - name: ticketing-service
     namespace: truve-ticketing-service
@@ -47,15 +61,15 @@ scaledObjects:
       name: ticketing-service-ticketing-service
 
     minReplicaCount: 1
-    maxReplicaCount: 15
+    maxReplicaCount: 15 # DB/Redis 같은 후단 자원까지 같이 고려한 상한이어야 한다.
     pollingInterval: 15
-    cooldownPeriod: 180 # 3분으로 짧게 잡아서 빠르게 대응하도록 설정
+    cooldownPeriod: 180 # 예약 트래픽은 순간 피크가 잦아 바로 줄이면 다시 늘어나는 진동이 생기기 쉽다.
 
     type: prometheus
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: ticketing_http_requests_per_second
-      threshold: '30'
+      threshold: '30' # Pod 1개당 약 30 RPS 수준을 시작점으로 둔 값. DB lock/쿼리 지연이 붙는 순간 실제 허용치는 더 낮아질 수 있다.
       query: |
         (
           sum(rate(http_server_request_duration_seconds_count{service_name="ticketing-service"}[1m]))
@@ -64,11 +78,14 @@ scaledObjects:
           or
           vector(0)
         )
+      # ticketing은 단순 RPS보다도 "응답시간이 무너지지 않는 Pod당 처리량"을 기준으로 threshold를 잡아야 한다.
+      # 부하테스트에서는 RPS만 보지 말고 p95/p99, DB connection pool 대기, 락 경합 지표를 같이 본다.
 
   #####################################################################
   # auth-service
   # 로그인 / 토큰 발급 / 검증 구간이 부하 시작 시 병목이 될 수 있음
-  # 부하테스트 시나리오에 로그인 포함 시 1차 적용 권장
+  # 로그인 시나리오가 포함되면 초반 burst가 몰리므로 함께 보는 편이 좋다.
+  # 반대로 이미 발급된 토큰만 쓰는 테스트라면 영향도가 낮을 수 있다.
   #####################################################################
   - name: auth-service
     namespace: truve-auth-service
@@ -78,15 +95,15 @@ scaledObjects:
       name: auth-service-auth-service
 
     minReplicaCount: 1
-    maxReplicaCount: 8
+    maxReplicaCount: 8 # 인증 서비스는 CPU보다 외부 저장소/서명키 처리 병목이 먼저 올 수 있어 상한을 과하게 키우지 않는다.
     pollingInterval: 15
-    cooldownPeriod: 180 # 3분으로 짧게 잡아서 빠르게 대응하도록 설정
+    cooldownPeriod: 180
 
     type: prometheus
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: auth_http_requests_per_second
-      threshold: '20'
+      threshold: '20' # 토큰 발급/검증 비용을 감안해 gateway보다 보수적으로 시작한다.
       query: |
         (
           sum(rate(http_server_request_duration_seconds_count{service_name="auth-service"}[1m]))
@@ -95,11 +112,13 @@ scaledObjects:
           or
           vector(0)
         )
+      # 인증 계열은 요청당 CPU 사용량, 외부 인증 저장소 접근, JWT 서명/검증 비용이 커서 threshold를 낮게 잡는 편이 안전하다.
+      # 부하테스트에서 로그인 성공률, 인증 실패율, 토큰 발급 지연시간을 같이 확인해야 한다.
 
   #####################################################################
   # payment-service
-  # 결제 완료 시나리오까지 부하테스트 범위에 포함될 때 2차 적용
-  # 지금은 false로 두고 후속 튜닝 대상으로 관리
+  # 결제 완료까지 포함한 end-to-end 시나리오에서 의미가 큰 서비스
+  # 외부 PG/API 연동이 있으면 Pod 수를 늘려도 병목이 안 풀릴 수 있어 별도 검증이 필요하다.
   #####################################################################
   - name: payment-service
     namespace: truve-payment-service
@@ -117,7 +136,7 @@ scaledObjects:
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: payment_http_requests_per_second
-      threshold: '10'
+      threshold: '10' # 결제는 요청당 처리 시간이 긴 경우가 많아 가장 보수적인 시작값으로 둔다.
       query: |
         (
           sum(rate(http_server_request_duration_seconds_count{service_name="payment-service"}[1m]))
@@ -126,11 +145,14 @@ scaledObjects:
           or
           vector(0)
         )
+      # 결제는 RPS보다 성공률/재시도율/외부 연동 지연의 영향을 크게 받는다.
+      # threshold는 "Pod가 처리 가능한 비즈니스 트랜잭션 수" 기준으로 잡고, 외부 API rate limit도 함께 확인해야 한다.
 
   #####################################################################
   # queue-service
-  # redis-exporter가 수집하는 queue prefix key group 기준으로 스케일
-  # 실제 list length까지 필요하면 앱 또는 Lua script 메트릭으로 확장
+  # 비동기 적체를 보고 소비자를 늘리기 위한 대상
+  # 현재는 redis-exporter가 제공하는 key group count를 신호로 삼지만, 이것은 "실제 대기 건수"와 동일하지 않을 수 있다.
+  # 더 정밀하게 하려면 queue length, 처리 지연 시간, oldest message age 같은 메트릭으로 바꾸는 편이 좋다.
   #####################################################################
   - name: queue-service
     namespace: truve-queue-service
@@ -139,17 +161,20 @@ scaledObjects:
     scaleTargetRef:
       name: queue-service-queue-service
 
-    minReplicaCount: 2
-    maxReplicaCount: 50
+    minReplicaCount: 2 # 소비자는 0개가 되면 적체 해소가 늦어질 수 있어 2개부터 시작
+    maxReplicaCount: 50 # 큐 드레인 속도를 빠르게 올릴 수 있도록 비교적 높게 둔 상한
     pollingInterval: 15
-    cooldownPeriod: 120 # 큐 소비는 빠르게 대응하는 게 중요하므로 2분으로 짧게 설정
+    cooldownPeriod: 120 # 적체가 풀리면 비교적 빨리 줄여도 무방하므로 HTTP 서비스보다 짧게 설정
 
     type: prometheus
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: redis_queue_key_group_count
-      threshold: '100'
+      threshold: '100' # 현재 메트릭이 "queue prefix 하위 key 수"에 가까워 정확한 backlog 길이 대신 이상 징후 감지용 시작값으로 본다.
       query: |
         sum(
           redis_key_group_count{key_group="queue"}
         )
+      # queue 스케일링의 이상적인 기준은 "적체 건수" 또는 "메시지가 대기한 시간"이다.
+      # 지금 메트릭은 backlog를 근사하는 대체 지표이므로, threshold 100 역시 절대값이라기보다 초기 운영 기준선에 가깝다.
+      # 부하테스트에서는 queue 적체가 몇 건일 때 처리 지연이 체감되는지 보고 threshold를 다시 정해야 한다.
