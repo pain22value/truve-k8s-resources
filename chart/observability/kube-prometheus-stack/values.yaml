@@ -100,7 +100,7 @@ alertmanager:
             requests:
               storage: 10Gi
 
-kubeStateMetrics:
+kube-state-metrics:
   nodeSelector:
     workload: monitoring
   tolerations:
