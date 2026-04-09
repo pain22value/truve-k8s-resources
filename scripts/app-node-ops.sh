@@ -8,8 +8,10 @@ DEFAULT_NAMESPACES="${DEFAULT_NAMESPACES:-truve-auth-service truve-ticketing-ser
 usage() {
   cat <<'EOF'
 Usage:
+  ./scripts/app-node-ops.sh list-app-nodes
   ./scripts/app-node-ops.sh list-fixed-pods
   ./scripts/app-node-ops.sh list-node-pods <node-name>
+  ./scripts/app-node-ops.sh taint-app-nodes [node-name ...]
   ./scripts/app-node-ops.sh list-terminating
   ./scripts/app-node-ops.sh cleanup-terminating [namespace ...]
   ./scripts/app-node-ops.sh drain-node <node-name>
@@ -29,6 +31,11 @@ require_kubectl() {
 
 list_app_nodes() {
   kubectl get nodes -l "$NODEPOOL_LABEL" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+}
+
+list_app_nodes_with_taints() {
+  kubectl get nodes -l "$NODEPOOL_LABEL" \
+    -o custom-columns='NAME:.metadata.name,STATUS:.status.conditions[-1].type,TAINTS:.spec.taints'
 }
 
 list_fixed_pods() {
@@ -52,6 +59,19 @@ list_node_pods() {
     --field-selector "spec.nodeName=$node" \
     -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,OWNER_KIND:.metadata.ownerReferences[0].kind,OWNER_NAME:.metadata.ownerReferences[0].name,PHASE:.status.phase,DELETION_TIMESTAMP:.metadata.deletionTimestamp' \
     --no-headers
+}
+
+taint_app_nodes() {
+  if [ "$#" -gt 0 ]; then
+    nodes="$*"
+  else
+    nodes="$(list_app_nodes)"
+  fi
+
+  for node in $nodes; do
+    echo "Applying taint to $node"
+    kubectl taint node "$node" workload=app:NoSchedule --overwrite
+  done
 }
 
 list_terminating() {
@@ -89,6 +109,9 @@ require_kubectl
 
 command="${1:-}"
 case "$command" in
+  list-app-nodes)
+    list_app_nodes_with_taints
+    ;;
   list-fixed-pods)
     list_fixed_pods
     ;;
@@ -98,6 +121,10 @@ case "$command" in
       exit 1
     fi
     list_node_pods "$2"
+    ;;
+  taint-app-nodes)
+    shift
+    taint_app_nodes "$@"
     ;;
   list-terminating)
     list_terminating

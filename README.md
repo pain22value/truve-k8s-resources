@@ -5,6 +5,7 @@
 `app-general` 노드에 붙어 있는 파드 중 `DaemonSet`을 제외하고 확인합니다.
 
 ```sh
+./scripts/app-node-ops.sh list-app-nodes
 ./scripts/app-node-ops.sh list-fixed-pods
 ```
 
@@ -12,6 +13,12 @@
 
 ```sh
 ./scripts/app-node-ops.sh list-node-pods <node-name>
+```
+
+기존 app 노드에 taint가 비어 있으면 아래 명령으로 일괄 적용합니다.
+
+```sh
+./scripts/app-node-ops.sh taint-app-nodes
 ```
 
 직접 명령으로 확인하려면 아래처럼 조회하면 됩니다.
