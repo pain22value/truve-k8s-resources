@@ -14,6 +14,14 @@ spec:
       template:
         spec:
           serviceAccountName: {{ .Values.serviceAccount.name }}
+          {{- with .Values.runtime.nodeSelector }}
+          nodeSelector:
+{{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.runtime.tolerations }}
+          tolerations:
+{{ toYaml . | nindent 12 }}
+          {{- end }}
           restartPolicy: OnFailure
           containers:
             - name: scheduler

@@ -31,7 +31,10 @@ appGeneralNodePool:
     workload: app # 앱 파드가 nodeSelector/affinity로 활용 가능
     node-type: general
 
-  taints: [] # 일반 앱은 전용 taint 없이 공유 가능하게 둠
+  taints:
+    - key: workload
+      value: app
+      effect: NoSchedule
 
   requirements: # 이 NodePool이 전체적으로 얼마나 커질 수 있는지 상한
     - key: kubernetes.io/arch

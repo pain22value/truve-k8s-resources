@@ -14,6 +14,11 @@ spec:
     spec:
       nodeSelector:
         workload: app
+      tolerations:
+        - key: "workload"
+          operator: "Equal"
+          value: "app"
+          effect: "NoSchedule"
 
       initContainers:
         - name: copy-otel-agent

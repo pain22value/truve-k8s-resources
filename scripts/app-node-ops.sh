@@ -9,6 +9,7 @@ usage() {
   cat <<'EOF'
 Usage:
   ./scripts/app-node-ops.sh list-fixed-pods
+  ./scripts/app-node-ops.sh list-node-pods <node-name>
   ./scripts/app-node-ops.sh list-terminating
   ./scripts/app-node-ops.sh cleanup-terminating [namespace ...]
   ./scripts/app-node-ops.sh drain-node <node-name>
@@ -43,6 +44,14 @@ list_fixed_pods() {
       -o custom-columns='NODE:.spec.nodeName,NAMESPACE:.metadata.namespace,NAME:.metadata.name,OWNER_KIND:.metadata.ownerReferences[0].kind,OWNER_NAME:.metadata.ownerReferences[0].name,PHASE:.status.phase' \
       --no-headers
   done | awk '$4 != "DaemonSet"'
+}
+
+list_node_pods() {
+  node="$1"
+  kubectl get pods -A \
+    --field-selector "spec.nodeName=$node" \
+    -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,OWNER_KIND:.metadata.ownerReferences[0].kind,OWNER_NAME:.metadata.ownerReferences[0].name,PHASE:.status.phase,DELETION_TIMESTAMP:.metadata.deletionTimestamp' \
+    --no-headers
 }
 
 list_terminating() {
@@ -82,6 +91,13 @@ command="${1:-}"
 case "$command" in
   list-fixed-pods)
     list_fixed_pods
+    ;;
+  list-node-pods)
+    if [ "$#" -ne 2 ]; then
+      usage
+      exit 1
+    fi
+    list_node_pods "$2"
     ;;
   list-terminating)
     list_terminating

@@ -6,6 +6,15 @@ image:
 serviceAccount:
   name: night-day-scheduler
 
+runtime:
+  nodeSelector:
+    workload: system
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
 rbac:
   create: true
 
