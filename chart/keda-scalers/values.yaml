@@ -16,18 +16,18 @@ scaledObjects:
       name: gateway-service-gateway-service
 
     minReplicaCount: 1
-    maxReplicaCount: 10
-    pollingInterval: 30
-    cooldownPeriod: 300
+    maxReplicaCount: 20
+    pollingInterval: 15
+    cooldownPeriod: 180
 
     type: prometheus
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       metricName: gateway_http_requests_per_second
-      threshold: '50'
+      threshold: '75' # 15,000명 시 초당 75개의 요청이 들어온다고 가정 (평균 200ms 응답 시간 기준)
       query: |
         sum(
-          rate(http_server_requests_seconds_count{namespace="gateway-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="truve-gateway-service"}[1m])
         )
 
   #####################################################################
@@ -43,9 +43,9 @@ scaledObjects:
       name: ticketing-service-ticketing-service
 
     minReplicaCount: 1
-    maxReplicaCount: 10
-    pollingInterval: 30
-    cooldownPeriod: 300
+    maxReplicaCount: 15
+    pollingInterval: 15
+    cooldownPeriod: 180 # 3분으로 짧게 잡아서 빠르게 대응하도록 설정
 
     type: prometheus
     prometheus:
@@ -54,7 +54,7 @@ scaledObjects:
       threshold: '30'
       query: |
         sum(
-          rate(http_server_requests_seconds_count{namespace="ticketing-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="truve-ticketing-service"}[1m])
         )
 
   #####################################################################
@@ -70,9 +70,9 @@ scaledObjects:
       name: auth-service-auth-service
 
     minReplicaCount: 1
-    maxReplicaCount: 5
-    pollingInterval: 30
-    cooldownPeriod: 300
+    maxReplicaCount: 8
+    pollingInterval: 15
+    cooldownPeriod: 180 # 3분으로 짧게 잡아서 빠르게 대응하도록 설정
 
     type: prometheus
     prometheus:
@@ -81,7 +81,7 @@ scaledObjects:
       threshold: '20'
       query: |
         sum(
-          rate(http_server_requests_seconds_count{namespace="auth-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="truve-auth-service"}[1m])
         )
 
   #####################################################################
@@ -91,15 +91,15 @@ scaledObjects:
   #####################################################################
   - name: payment-service
     namespace: truve-payment-service
-    enabled: false
+    enabled: true
 
     scaleTargetRef:
       name: payment-service-payment-service
 
     minReplicaCount: 1
-    maxReplicaCount: 5
-    pollingInterval: 30
-    cooldownPeriod: 300
+    maxReplicaCount: 10
+    pollingInterval: 15
+    cooldownPeriod: 180
 
     type: prometheus
     prometheus:
@@ -108,13 +108,13 @@ scaledObjects:
       threshold: '10'
       query: |
         sum(
-          rate(http_server_requests_seconds_count{namespace="payment-service"}[1m])
+          rate(http_server_requests_seconds_count{namespace="truve-payment-service"}[1m])
         )
 
   #####################################################################
   # queue-service
-  # 현재는 Kafka 연결/소비 구조 안정화가 먼저라 보류
-  # 나중에 Kafka lag 기준 scaler로 별도 설계
+  # redis-exporter가 수집하는 queue prefix key group 기준으로 스케일
+  # 실제 list length까지 필요하면 앱 또는 Lua script 메트릭으로 확장
   #####################################################################
   - name: queue-service
     namespace: truve-queue-service
@@ -123,17 +123,17 @@ scaledObjects:
     scaleTargetRef:
       name: queue-service-queue-service
 
-    minReplicaCount: 1
-    maxReplicaCount: 5
-    pollingInterval: 30
-    cooldownPeriod: 300
+    minReplicaCount: 2
+    maxReplicaCount: 50
+    pollingInterval: 15
+    cooldownPeriod: 120 # 큐 소비는 빠르게 대응하는 게 중요하므로 2분으로 짧게 설정
 
     type: prometheus
     prometheus:
       serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
-      metricName: queue_http_requests_per_second
-      threshold: '10'
+      metricName: redis_queue_key_group_count
+      threshold: '100'
       query: |
         sum(
-          rate(http_server_requests_seconds_count{namespace="queue-service"}[1m])
+          redis_key_group_count{key_group="queue"}
         )

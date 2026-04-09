@@ -1,0 +1,52 @@
+{{- if .Values.redisExporter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-exporter
+  labels:
+    app: redis-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-exporter
+  template:
+    metadata:
+      labels:
+        app: redis-exporter
+    spec:
+      {{- with .Values.redisExporter.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.redisExporter.tolerations }}
+      tolerations:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: redis-exporter
+          image: "{{ .Values.redisExporter.image.repository }}:{{ .Values.redisExporter.image.tag }}"
+          imagePullPolicy: {{ .Values.redisExporter.image.pullPolicy }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.redisExporter.service.port }}
+              protocol: TCP
+          env:
+            - name: REDIS_ADDR
+              value: {{ .Values.redisExporter.env.redisAddress | quote }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_PASSWORD
+            - name: REDIS_EXPORTER_IS_CLUSTER
+              value: {{ .Values.redisExporter.env.isCluster | quote }}
+            - name: REDIS_EXPORTER_CHECK_KEY_GROUPS
+              value: {{ .Values.redisExporter.env.checkKeyGroups | quote }}
+            - name: REDIS_EXPORTER_MAX_DISTINCT_KEY_GROUPS
+              value: {{ .Values.redisExporter.env.maxDistinctKeyGroups | quote }}
+            - name: REDIS_EXPORTER_CHECK_KEYS_BATCH_SIZE
+              value: {{ .Values.redisExporter.env.checkKeysBatchSize | quote }}
+          resources:
+{{ toYaml .Values.redisExporter.resources | nindent 12 }}
+{{- end }}
