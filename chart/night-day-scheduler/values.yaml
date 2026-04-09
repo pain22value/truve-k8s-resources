@@ -1,6 +1,6 @@
 image:
   repository: bitnami/kubectl
-  tag: "latest"
+  tag: 'latest'
   pullPolicy: IfNotPresent
 
 serviceAccount:
@@ -12,10 +12,10 @@ rbac:
 schedules:
   timezone: Asia/Seoul
   day:
-    cron: "0 9 * * *"
+    cron: '0 9 * * *'
     baselineReplicas: 1
   night:
-    cron: "0 21 * * *"
+    cron: '0 19 * * *'
 
 targets:
   deployments:
