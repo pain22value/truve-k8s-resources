@@ -57,6 +57,8 @@ grafana:
 
 prometheus:
   prometheusSpec:
+    serviceMonitorNamespaceSelector: {}
+    podMonitorNamespaceSelector: {}
     nodeSelector:
       workload: monitoring
     tolerations:

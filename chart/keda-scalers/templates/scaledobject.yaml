@@ -20,7 +20,8 @@ spec:
       metadata:
         serverAddress: {{ .prometheus.serverAddress | quote }} # 프로메테우스 서버 주소
         metricName: {{ .prometheus.metricName | quote }}       # 조회할 메트릭 이름
-        query: {{ .prometheus.query | quote }}                 # 확장을 결정할 PromQL 쿼리문
+        query: |-                                              # 확장을 결정할 PromQL 쿼리문
+{{ .prometheus.query | nindent 10 }}
         threshold: {{ .prometheus.threshold | quote }}         # 복제본을 늘리기 위한 임계치 (기준값)
       {{- if .authenticationRef }}          # 인증 정보가 필요한 경우 (ID/PW 등)
       authenticationRef:
