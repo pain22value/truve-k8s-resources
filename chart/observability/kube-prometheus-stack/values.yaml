@@ -15,6 +15,7 @@ grafana:
   adminPassword: truve#12
   additionalDataSources:
     - name: Loki
+      uid: loki
       type: loki
       access: proxy
       url: http://loki.observability.svc.cluster.local:3100
@@ -28,6 +29,7 @@ grafana:
             url: '$${__value.raw}'
 
     - name: Tempo
+      uid: tempo
       type: tempo
       access: proxy
       url: http://tempo.observability.svc.cluster.local:3200
@@ -35,15 +37,15 @@ grafana:
       jsonData:
         httpMethod: GET
         lokiSearch:
-          datasourceUid: Loki
+          datasourceUid: loki
         traceQuery:
           type: traceql
         serviceMap:
-          datasourceUid: Prometheus
+          datasourceUid: prometheus
         nodeGraph:
           enabled: true
         traceToLogsV2:
-          datasourceUid: Loki
+          datasourceUid: loki
           spanEndTimeShift: '5m'
           tags:
             - key: service.name
