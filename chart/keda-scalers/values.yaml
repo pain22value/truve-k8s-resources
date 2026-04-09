@@ -26,8 +26,12 @@ scaledObjects:
       metricName: gateway_http_requests_per_second
       threshold: '75' # 15,000명 시 초당 75개의 요청이 들어온다고 가정 (평균 200ms 응답 시간 기준)
       query: |
-        sum(
-          rate(http_server_requests_seconds_count{namespace="truve-gateway-service"}[1m])
+        (
+          sum(rate(http_server_request_duration_seconds_count{service_name="gateway-service"}[1m]))
+          or
+          sum(rate(http_server_duration_milliseconds_count{service_name="gateway-service"}[1m]))
+          or
+          vector(0)
         )
 
   #####################################################################
@@ -53,8 +57,12 @@ scaledObjects:
       metricName: ticketing_http_requests_per_second
       threshold: '30'
       query: |
-        sum(
-          rate(http_server_requests_seconds_count{namespace="truve-ticketing-service"}[1m])
+        (
+          sum(rate(http_server_request_duration_seconds_count{service_name="ticketing-service"}[1m]))
+          or
+          sum(rate(http_server_duration_milliseconds_count{service_name="ticketing-service"}[1m]))
+          or
+          vector(0)
         )
 
   #####################################################################
@@ -80,8 +88,12 @@ scaledObjects:
       metricName: auth_http_requests_per_second
       threshold: '20'
       query: |
-        sum(
-          rate(http_server_requests_seconds_count{namespace="truve-auth-service"}[1m])
+        (
+          sum(rate(http_server_request_duration_seconds_count{service_name="auth-service"}[1m]))
+          or
+          sum(rate(http_server_duration_milliseconds_count{service_name="auth-service"}[1m]))
+          or
+          vector(0)
         )
 
   #####################################################################
@@ -107,8 +119,12 @@ scaledObjects:
       metricName: payment_http_requests_per_second
       threshold: '10'
       query: |
-        sum(
-          rate(http_server_requests_seconds_count{namespace="truve-payment-service"}[1m])
+        (
+          sum(rate(http_server_request_duration_seconds_count{service_name="payment-service"}[1m]))
+          or
+          sum(rate(http_server_duration_milliseconds_count{service_name="payment-service"}[1m]))
+          or
+          vector(0)
         )
 
   #####################################################################

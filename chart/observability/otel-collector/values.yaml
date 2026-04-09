@@ -4,6 +4,13 @@ image:
   repository: otel/opentelemetry-collector-contrib
   tag: 0.130.0
 
+ports:
+  prometheus:
+    enabled: true
+    containerPort: 8890
+    servicePort: 8890
+    protocol: TCP
+
 config:
   receivers:
     otlp:
@@ -31,6 +38,8 @@ config:
     # Prometheus가 긁어갈 수 있도록 메트릭 노출
     prometheus:
       endpoint: '0.0.0.0:8890'
+      resource_to_telemetry_conversion:
+        enabled: true
     # 디버깅용 (로그로 데이터 확인 가능)
     debug: {}
 
