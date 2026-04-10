@@ -40,12 +40,14 @@ kubectl get deploy -A -o jsonpath='{range .items[?(@.spec.template.spec.nodeSele
 
 ## Night-Day Scheduler 동작
 
-`chart/night-day-scheduler`는 이제 두 가지 대상을 같이 스케일합니다. CronJob 자체는 `system` 노드에서만 돌도록 고정했습니다.
+`chart/night-day-scheduler`는 이제 두 가지 대상을 같이 스케일합니다. CronJob 자체는 `system` 노드에서 돌도록 고정했습니다.
 
 - `targets.deployments`: replica 복원값을 명시적으로 관리할 서비스
 - `targets.autoDiscoverAppDeployments`: `spec.template.spec.nodeSelector.workload=app` 인 Deployment를 자동 탐지할 대상
 
 덕분에 서비스 파드 외에 app 노드에 고정적으로 올라가는 Deployment가 생겨도 nightly scale down 대상에서 빠지지 않습니다.
+
+또한 KEDA가 붙은 서비스는 `targets.scaledObjects` 에도 반드시 포함되어야 합니다. 그렇지 않으면 night 스케줄이 Deployment를 `0`으로 내려도 KEDA의 `minReplicaCount` 가 다시 replica를 올려 app 노드 scale down이 막힐 수 있습니다.
 
 또한 `app-general` NodePool에는 `workload=app:NoSchedule` taint를 적용하고, 실제 서비스 Deployment들에만 같은 toleration을 추가했습니다. 그래서 `external-secrets`, `istiod`, `aws-load-balancer-controller`, `kube-state-metrics` 같은 비앱 파드가 app 노드로 들어와 Karpenter scale down을 막는 상황을 줄일 수 있습니다.
 

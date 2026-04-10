@@ -59,6 +59,8 @@ targets:
       name: auth-service
     - namespace: truve-ticketing-service
       name: ticketing-service
+    - namespace: truve-payment-service
+      name: payment-service
     - namespace: truve-musical-service
       name: musical-service
     - namespace: truve-queue-service
