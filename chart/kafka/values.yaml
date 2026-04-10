@@ -1,4 +1,4 @@
-replicaCount: 3
+replicaCount: 1
 
 zookeeper:
   image: "confluentinc/cp-zookeeper:7.5.0"
@@ -11,7 +11,7 @@ zookeeper:
 kafka:
   image: "confluentinc/cp-kafka:7.5.0"
   port: 9092
-  replicationFactor: 3
+  replicationFactor: 1
   storage:
     size: 20Gi
     storageClassName: gp3
