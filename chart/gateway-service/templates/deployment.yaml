@@ -19,6 +19,13 @@ spec:
           operator: "Equal"
           value: "app"
           effect: "NoSchedule"
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: gateway-service
 
       initContainers:
         - name: copy-otel-agent
