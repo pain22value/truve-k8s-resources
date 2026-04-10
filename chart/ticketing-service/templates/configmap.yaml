@@ -9,5 +9,7 @@ data:
         url: {{ .Values.config.SPRING_DATASOURCE_URL | quote }}
       data:
         redis:
+          host: {{ .Values.config.SPRING_DATA_REDIS_HOST | quote }}
+          port: {{ .Values.config.SPRING_DATA_REDIS_PORT }}
           cluster:
-            nodes: {{ .Values.config.SPRING_DATA_REDIS_CLUSTER_NODES | quote }}
+            enabled: false
