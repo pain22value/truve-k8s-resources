@@ -35,3 +35,4 @@ config:
   SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-service.truve-kafka.svc.cluster.local:9092"
   SPRING_DATA_REDIS_HOST: "redis.truve-redis.svc.cluster.local"
   SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_DATA_REDIS_CLUSTER_ENABLED: "false"

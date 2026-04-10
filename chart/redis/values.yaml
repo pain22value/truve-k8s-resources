@@ -30,8 +30,7 @@ config:
   clusterEnabled: "no"
   clusterNodeTimeout: "5000"
 
-nodeSelector:
-  workload: messaging
+nodeSelector: {}
 
 tolerations:
   - key: "workload"
@@ -39,18 +38,7 @@ tolerations:
     value: "messaging"
     effect: "NoSchedule"
 
-affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-              - key: app
-                operator: In
-                values:
-                  - redis
-          topologyKey: "kubernetes.io/hostname"
+affinity: {}
 
 redisExporter:
   enabled: true
@@ -71,8 +59,7 @@ redisExporter:
       cpu: 250m
       memory: 256Mi
 
-  nodeSelector:
-    workload: monitoring
+  nodeSelector: {}
 
   tolerations:
     - key: "workload"

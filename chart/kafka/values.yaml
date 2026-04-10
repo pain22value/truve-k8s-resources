@@ -16,8 +16,7 @@ kafka:
     size: 20Gi
     storageClassName: gp3
 
-nodeSelector:
-  workload: messaging
+nodeSelector: {}
 
 tolerations:
   - key: "node.kubernetes.io/not-ready"
