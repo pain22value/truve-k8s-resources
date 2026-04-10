@@ -149,6 +149,39 @@ scaledObjects:
       # threshold는 "Pod가 처리 가능한 비즈니스 트랜잭션 수" 기준으로 잡고, 외부 API rate limit도 함께 확인해야 한다.
 
   #####################################################################
+  # musical-service
+  # 공연/상품 조회 성격의 읽기 트래픽이 주를 이룰 가능성이 높아 gateway 다음으로 완만한 확장 곡선을 기대하는 대상
+  # 읽기 비중이 높더라도 캐시 적중률과 DB 조회 패턴에 따라 급격히 병목이 생길 수 있어 기본 확장 여유를 둔다.
+  #####################################################################
+  - name: musical-service
+    namespace: truve-musical-service
+    enabled: true
+
+    scaleTargetRef:
+      name: musical-service-musical-service
+
+    minReplicaCount: 1
+    maxReplicaCount: 10
+    pollingInterval: 15
+    cooldownPeriod: 180
+
+    type: prometheus
+    prometheus:
+      serverAddress: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
+      metricName: musical_http_requests_per_second
+      threshold: '40' # 조회 트래픽 중심 서비스라는 가정의 시작값. 캐시 미스와 DB 응답시간을 보며 재조정이 필요하다.
+      query: |
+        (
+          sum(rate(http_server_request_duration_seconds_count{service_name="musical-service"}[1m]))
+          or
+          sum(rate(http_server_duration_milliseconds_count{service_name="musical-service"}[1m]))
+          or
+          vector(0)
+        )
+      # musical-service는 읽기 요청이 많아도 캐시/DB 구조에 따라 실제 Pod당 처리량 차이가 커질 수 있다.
+      # 부하테스트에서 p95/p99와 DB CPU, 캐시 적중률을 함께 보며 threshold를 조정하는 편이 안전하다.
+
+  #####################################################################
   # queue-service
   # 비동기 적체를 보고 소비자를 늘리기 위한 대상
   # 현재는 redis-exporter가 제공하는 key group count를 신호로 삼지만, 이것은 "실제 대기 건수"와 동일하지 않을 수 있다.
