@@ -20,27 +20,27 @@ spec:
             service:
               type: ClusterIP
             nodeSelector:
-              workload: system
+              workload: cicd
 
           controller:
             replicas: 1
             nodeSelector:
-              workload: system
+              workload: cicd
 
           repoServer:
             replicas: 1
             nodeSelector:
-              workload: system
+              workload: cicd
 
           applicationSet:
             replicas: 1
             nodeSelector:
-              workload: system
+              workload: cicd
 
           redis:
             enabled: true
             nodeSelector:
-              workload: system
+              workload: cicd
 
           dex:
             enabled: false

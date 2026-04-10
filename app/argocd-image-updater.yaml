@@ -16,7 +16,7 @@ spec:
         config:
           applicationsAPIKind: kubernetes
         nodeSelector:
-          workload: system
+          workload: cicd
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
