@@ -42,9 +42,6 @@ spec:
             - name: redis
               containerPort: 6379
               protocol: TCP
-            - name: cluster-bus
-              containerPort: 16379
-              protocol: TCP
           resources:
 {{ toYaml .Values.resources | nindent 12 }}
           volumeMounts:

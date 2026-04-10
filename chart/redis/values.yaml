@@ -1,4 +1,4 @@
-replicaCount: 6
+replicaCount: 1
 
 image:
   repository: redis
@@ -27,7 +27,7 @@ config:
   maxmemoryPolicy: allkeys-lru
   appendonly: "yes"
   save: "900 1 300 10 60 10000"
-  clusterEnabled: "yes"
+  clusterEnabled: "no"
   clusterNodeTimeout: "5000"
 
 nodeSelector:
@@ -86,8 +86,8 @@ redisExporter:
     scrapeTimeout: 10s
 
   env:
-    redisAddress: "redis://redis-headless.truve-redis.svc.cluster.local:6379"
-    isCluster: "true"
+    redisAddress: "redis://redis.truve-redis.svc.cluster.local:6379"
+    isCluster: "false"
     checkKeyGroups: "^(queue):.*$"
     maxDistinctKeyGroups: "10"
     checkKeysBatchSize: "1000"
